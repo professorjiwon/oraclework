@@ -182,9 +182,118 @@ SELECT EMP_NAME, PHONE
 
 --3. 직급코드가 'J3'이 아닌 사원들의 사번, 사원명, 직급코드, (퇴사여부) 조회
 
+-------------------------------------------------------------
+/*
+    <논리 연산자>
+    AND (그리고, ~이면서)
+    OR (또는, ~이거나)
+*/
 
+-- EMPLOYEE에서 부서코드가 'D9'이면서 급여가 500만원 이상인 사원들의 사원명, 부서코드, 급여 조회
+SELECT EMP_NAME, DEPT_CODE, SALARY
+  FROM EMPLOYEE
+ WHERE DEPT_CODE = 'D9' AND SALARY >= 5000000;
+ 
+-- EMPLOYEE에서 부서코드가 'D5'이거나 급여가 300만원 이상인 사원들의 사원명, 부서코드, 급여 조회
+SELECT EMP_NAME, DEPT_CODE, SALARY
+  FROM EMPLOYEE
+ WHERE DEPT_CODE = 'D5' OR SALARY >= 3000000; 
 
+-- EMPLOYEE에서 급여가 350만원 이상 600만원 이하인 사원들의 사원명, 사번, 급여 조회
+SELECT EMP_NAME, EMP_ID, SALARY
+  FROM EMPLOYEE
+-- WHERE 3500000 <= SALARY <= 6000000  -- 오류
+WHERE 3500000 <= SALARY AND SALARY <= 6000000;
 
+------------------------------------------------------------------------
+/*
+    <BETWEEN AND>
+    조건식에서 사용되는 구문
+    ~이상 ~이하인 범위에 대한 조건을 제시할 사용하는 연산자
+    
+    [표현법]
+    비교대상컬럼 BETWEEN 하한값 AND 상한값
+    -> 해당 컬럼값이 하한값 이상이고 상한값 이하인 경우
+*/
+SELECT EMP_NAME, EMP_ID, SALARY
+  FROM EMPLOYEE
+ WHERE SALARY BETWEEN 3500000 AND 6000000;  
+
+-- 입사일이 1990년대 들어온 사원의 사원명, 입사일 조회
+SELECT EMP_NAME, HIRE_DATE
+  FROM EMPLOYEE
+-- WHERE HIRE_DATE >= '90/01/01' AND HIRE_DATE <= '99/12/31';
+ WHERE HIRE_DATE BETWEEN '90/01/01' AND '99/12/31'; 
+
+-----------------------------------------------------------------------------------
+/*
+    <LIKE>
+    비교하고자하는 컬럼값이 내가 제시한 특정 패턴에 만족하는 경우 조회
+    
+    [표현법]
+    비교대상컬럼 LIKE '특정패턴'
+    : 특정패턴 제시시 '%','_'를 와일드카드로 쓸 수 있음
+    
+    >> '%' : 0글자 이상
+    EX) 비교대상컬럼 LIKE '문자%' => 비교대상의 컬럼값이 '문자'로 시작되는 데이터 조회
+        비교대상컬럼 LIKE '%문자' => 비교대상의 컬럼값이 '문자'로 끝나는 데이터 조회
+        비교대상컬럼 LIKE '%문자%' => 비교대상의 컬럼값이 '문자'가 포함되어 있는 데이터 조회
+        
+    >> '_' : 1글자
+    EX) 비교대상컬럼 LIKE '_문자' => 비교대상의 컬럼값이 '문자'앞에 무조건 한글자가 들어있는 데이터 조회
+        비교대상컬럼 LIKE '_ _문자' => 비교대상의 컬럼값이 '문자'앞에 무조건 두글자가 들어있는 데이터 조회
+        비교대상컬럼 LIKE '_문자_' => 비교대상의 컬럼값이 '문자'앞에 무조건 한글자, 뒤에도 무조건 한글자가 들어있는 데이터 조회
+*/
+
+-- EMPLOYEE에서 사원 성이 전씨인 사원들의 사원명, 급여, 입사일 조회
+SELECT EMP_NAME, SALARY, HIRE_DATE
+  FROM EMPLOYEE
+ WHERE EMP_NAME LIKE '전%'; 
+
+-- EMPLOYEE에서 사원의 이름에 '하'자가 들어있는 사원의 사원명, 이메일, 전화번호 조회
+SELECT EMP_NAME, EMAIL, PHONE
+  FROM EMPLOYEE
+ WHERE EMP_NAME LIKE '%하%'; 
+
+-- EMPLOYEE에서 사원의 이름에 '하'자 중간에 들어있는 사원의 사원명, 이메일, 전화번호 조회
+SELECT EMP_NAME, EMAIL, PHONE
+  FROM EMPLOYEE
+ WHERE EMP_NAME LIKE '_하_'; 
+
+-- EMPLOYEE에서 전화번호의 3번째 자리가 '1'인 사원의 사원명, 전화번호 조회
+SELECT EMP_NAME, PHONE
+  FROM EMPLOYEE
+ WHERE PHONE LIKE '__1%'; 
+ 
+-- 이메일중 _(언더바) 앞에 글자가 3글자인 사원들의 사원명, 이메일 조회
+SELECT EMP_NAME, EMAIL
+  FROM EMPLOYEE
+ WHERE EMAIL LIKE '____%';
+ -- 와일드카드로 사용하는 문자와 컬럼값에 들어있는 문자가 동일하기 때문에 조회 안됨
+ -- 모두다 와일드카드로 인식
+ /*
+    > 와일드카드와 문자를 구분해줘야 함
+    > 나만의 와일드카드를 ESCAPE로 등록
+      - 데이터값으로 취급하고자하는 값 앞에 나만의 와일드카드(문자,숫자,특수문자)를 넣어줌
+      - 특수기호 '&'는 안쓰는것이 좋다. 사용자로부터 입력받을 때 &를 사용함
+*/
+
+SELECT EMP_NAME, EMAIL
+  FROM EMPLOYEE
+ WHERE EMAIL LIKE '___$_%' ESCAPE '$';
+ 
+ SELECT EMP_NAME, EMAIL
+  FROM EMPLOYEE
+ WHERE EMAIL LIKE '___d_%' ESCAPE 'd';
+
+------------------- 실습문제----------------------
+--1. EMPLOYEE에서 이름이 '연'으로 끝나는 사원들의 사원명, 입사일 조회
+
+--2. EMPLOYEE에서 전화번호 처음 3자리가 010이 아닌 사원들의 사원명, 전화번호 조회
+
+--3. EMPLOYEE에서 이름에 '하'가 포함되어 있고 급여가 240만원 이상인 사원들의 사원명, 급여 조회
+
+--4. DEPARTMENT에서 해외영업부인 부서들의 부서코드, 부서명 조회
 
 
 
