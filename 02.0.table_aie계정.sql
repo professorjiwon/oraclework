@@ -3,6 +3,12 @@
 -- 버튼을 누르면 대화창에서 접속계정이 뜨고 F5를 누르면 모두 실행됨
 -- data는 기존 오라클의 샘플 데이터를 변경하여 사용(user : hr)
 -- 예전 버전에서는 rock만 풀면 되었었는데 21버전에서는 별도로 다운받아 넣고 설치해야됨
+DROP TABLE DEPARTMENT;
+DROP TABLE EMPLOYEE;
+DROP TABLE JOB;
+DROP TABLE LOCATION;
+DROP TABLE NATIONAL;
+DROP TABLE SAL_GRADE;
 
 -------------------------------------------------
 --- DDL for Table DEPARTMENT

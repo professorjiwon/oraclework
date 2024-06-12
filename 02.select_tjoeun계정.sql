@@ -55,7 +55,7 @@ SELECT EMP_NAME, SALARY, BONUS, SALARY*12, (SALARY+BONUS*SALARY)*12
 -- EMPLOYEE테이블 사원명, 입사일, 근무일수(오늘날짜-입사일)
 -- DATE형태끼리도 연산 가능 : 결과값은 일 단위
 -- * 오늘날짜 : SYSDATE
-SELECT EMP_NAME, HIRE_DATE, SYSDATE-HIRE_DATE
+SELECT EMP_NAME, HIRE_DATE, SYSDATE - HIRE_DATE
   FROM EMPLOYEE;
 -- 소수점까지 나오는 이유는 초단위까지 관리하기 때문
 
@@ -100,7 +100,7 @@ SELECT EMP_ID, EMP_NAME, SALARY, '원' AS 단위
     여러 컬럼값을 마치 하나의 컬럼값인것처럼 연결하거나, 컬럼값과 리터럴을 연결할 수 있음
 */
 
--- EMPLOYEE 사번, 사원명, 급여를 하나의 커럼으로 조회
+-- EMPLOYEE 사번, 사원명, 급여를 하나의 컬럼으로 조회
 SELECT EMP_ID || EMP_NAME || SALARY AS "사원의 급여"
   FROM EMPLOYEE;
 
@@ -108,7 +108,7 @@ SELECT EMP_ID || EMP_NAME || SALARY AS "사원의 급여"
 SELECT EMP_NAME || '의 월급은 ' || SALARY || '원 입니다'
 FROM EMPLOYEE;
 
-SELECT EMP_ID, EMP_NAME, SALARY || '원'
+SELECT EMP_ID, EMP_NAME, SALARY || '원' 급여
   FROM EMPLOYEE;
 
 --------------------------------------------------------------------------------
@@ -396,7 +396,7 @@ SELECT EMP_NAME, SALARY, JOB_CODE
 */
 SELECT *
   FROM EMPLOYEE
--- ORDER BY BONUS;          -- D오름차순 정렬 NULL이 LAST
+-- ORDER BY BONUS;          -- 오름차순 정렬 NULL이 LAST
 -- ORDER BY BONUS ASC;
 -- ORDER BY BONUS NULLS FIRST;
 
