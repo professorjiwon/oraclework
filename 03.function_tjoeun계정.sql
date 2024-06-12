@@ -326,6 +326,130 @@ ALTER SESSION SET NLS_LANGUAGE = KOREAN;
 SELECT LAST_DAY(SYSDATE) FROM DUAL;
 
 -- EMPLOYEE에서 사원명, 입사일, 입사한 날의 마지막 날짜 조회
+SELECT EMP_NAME, HIRE_DATE, LAST_DAY(HIRE_DATE)
+  FROM EMPLOYEE;
 
+---------------------------------------------------------------------------  
+/*
+    * EXTRACT : 특정 날짜로 부터 년도|월|일 값을 추출하여 반환해주는 함수(반환형:NUMBER)
+       
+       EXTRACT(YEAR FROM DATE) : 년도 추출
+       EXTRACT(MONTH FORM DATE) : 월만 추출
+       EXTRACT(DAY FROM DATE) : 일만 추출
+*/
+-- EMLPYEE에서 사원명, 입사년도, 입사월, 입사일 조회
+SELECT EMP_NAME, 
+        EXTRACT(YEAR FROM HIRE_DATE) "입사년도",
+        EXTRACT(MONTH FROM HIRE_DATE) "입사월",
+        EXTRACT(DAY FROM HIRE_DATE) "입사일"
+ FROM EMPLOYEE
+ORDER BY 입사년도, 입사월, 입사일; 
 
+--=========================================================================
+--                                                          형변환 함수
+--=========================================================================  
+/*
+    * TO_CHAR : 숫자 또는 날짜 타입의 값을  문자로 변환시켜주는 함수
+            반환 결과를 특정 형식에 맞게 출력할수 도 있다
+       TO_CAHR(숫자|날짜, [포맷])     
+*/
+--------------------------------------------------  숫자 => 문자타입
+/*
+    [포맷]
+    * 접두어 : L -> LOCAL(설정된 나라)의 화폐단위
+    
+    * 9 : 해당 자리의 숫자를 의미한다
+         - 해당 자리에 값이 없을 경우 소수점 이상은 공백,   소수점 이하는 0으로 표시
+    * 0 :  해당 자리의 숫자를 의미한다 
+        -  해당 자리에 값이 없을 경우 0으로 표시하고, 숫자의 길이를 고정적으로 표시할 때 주로 사용
+    * FM : 해당 자리에 값이 없을 경우 자리차지를 하지 않음    
+*/
+SELECT TO_CHAR(1234), 1234 FROM DUAL;       -- 문자는 왼쪽정렬, 숫자는 오른쪽 정렬
 
+SELECT TO_CHAR(1234, '999999') FROM DUAL;
+SELECT TO_CHAR(1234, '000000') FROM DUAL;
+SELECT TO_CHAR(1234, 'L999999') FROM DUAL;   -- 오른쪽 정렬
+
+SELECT TO_CHAR(1234, 'L99,999') FROM DUAL; 
+
+SELECT EMP_NAME, TO_CHAR(SALARY, 'L999,999,999'), TO_CHAR(SALARY*12, 'L999,999,999')
+  FROM EMPLOYEE;
+
+SELECT TO_CHAR(123.456, 'FM99999.999'),
+        TO_CHAR(123.456, 'FM90000.99'),
+        TO_CHAR(0.1000, 'FM9990.999'),
+        TO_CHAR(0.1000, 'FM9999.999')
+  FROM DUAL;
+  
+SELECT TO_CHAR(123.456, '99999.999'),
+        TO_CHAR(123.456, '90000.99'),
+        TO_CHAR(0.1000, '9990.999'),
+        TO_CHAR(0.1000, '9999.999')
+  FROM DUAL; 
+
+-------------------------------------------------- 날짜 => 문자타입
+-- 시간
+SELECT TO_CHAR(SYSDATE, 'PM') "KOREA",
+            TO_CHAR(SYSDATE,'AM', 'NLS_DATE_LANGUAGE=AMERICAN') "AMERICAN"
+ FROM DUAL;  -- AM,PM 상관없음
+
+ALTER SESSION SET NLS_LANGUAGE = AMERICAN;
+SELECT TO_CHAR(SYSDATE, 'PM') "AMERICAN" 
+ FROM DUAL;
+ 
+ALTER SESSION SET NLS_LANGUAGE = KOREAN;
+
+-- 12시간 형식, 24시간 형식
+SELECT TO_CHAR(SYSDATE, 'AM HH:MI:SS') FROM DUAL;  -- 12시간 형식
+SELECT TO_CHAR(SYSDATE, 'HH24:MI:SS') FROM DUAL;  -- 24시간 형식
+
+-- 날짜
+SELECT TO_CHAR(SYSDATE, 'YYYY-MM-DD DAY') FROM DUAL;
+SELECT TO_CHAR(SYSDATE, 'MON, YYYY') FROM DUAL;
+
+-- SELECT TO_CHAR(SYSDATE, 'YYYY"년 "MM"월 "DD"일 "DAY') FROM DUAL;
+SELECT TO_CHAR(SYSDATE, 'DL') FROM DUAL;
+
+SELECT TO_CHAR(SYSDATE, 'YY-MM-DD') FROM DUAL;
+
+-- 입사일을 ????년 ?월 ?일 ?요일 로 출력
+SELECT TO_CHAR(HIRE_DATE, 'DL')
+ FROM EMPLOYEE;
+ 
+------------------ 년도
+/*
+    YY : 무조건 '20'이 앞에 붙는다
+    RR : 50년을 기준으로 작으면 '20'을 크면 '19'
+*/
+SELECT TO_CHAR(SYSDATE, 'YYYY'),
+          TO_CHAR(SYSDATE, 'YY'),
+          TO_CHAR(SYSDATE, 'RRRR'),
+          TO_CHAR(SYSDATE, 'RR')
+FROM DUAL;
+
+----------------- 월
+SELECT TO_CHAR(SYSDATE, 'MM'),
+          TO_CHAR(SYSDATE, 'MON'),
+          TO_CHAR(SYSDATE, 'MONTH'),
+          TO_CHAR(SYSDATE, 'RM')   -- 로마기호로
+FROM DUAL;
+
+---------------- 일
+SELECT TO_CHAR(SYSDATE, 'DDD'), -- 년 기준 몇일째
+          TO_CHAR(SYSDATE, 'DD'),   -- 월 기준 몇일째
+          TO_CHAR(SYSDATE, 'D')      -- 주 기준(일요일) 몇일째
+FROM DUAL;
+    
+--------------- 요일
+SELECT TO_CHAR(SYSDATE, 'DAY'),
+          TO_CHAR(SYSDATE, 'DY')
+FROM DUAL;
+ 
+-------------------------------------------------------------------------------------------------------------------
+/*
+
+*/
+ 
+-- 환경설정 바꾸고 도구 -> 환경설정 -> 데이터베이스 -> NLS -> 날짜 포맷을 RRRR/MM/DD
+SELECT TO_DATE('981213','YYMMDD') FROM DUAL;
+SELECT TO_DATE('021213','YYMMDD') FROM DUAL;
