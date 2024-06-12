@@ -75,15 +75,34 @@ SELECT EMP_NAME, EMP_NO, SUBSTR(EMP_NO,8,1) 성별
   FROM EMPLOYEE;
   
 -- EMPLOYEE에서 여자사원들의 사원번호, 사원명, 성별 조회
+SELECT EMP_ID, EMP_NAME, SUBSTR(EMP_NO,8,1) 성별
+  FROM EMPLOYEE
+ WHERE SUBSTR(EMP_NO,8,1) = '2' OR SUBSTR(EMP_NO,8,1) = '4';
 
+-- EMPLOYEE에서 남자사원들의 사원번호, 사원명, 성별 조회
+SELECT EMP_ID, EMP_NAME, SUBSTR(EMP_NO,8,1) 성별
+  FROM EMPLOYEE
+ WHERE SUBSTR(EMP_NO,8,1) IN (1,3)
+ ORDER BY 2;
 
+-- EMPLOYEE에서 사원명, 이메일, 아이디 조회
+SELECT EMP_NAME, EMAIL, SUBSTR(EMAIL, 1, INSTR(EMAIL,'@')-1) "아이디"
+  FROM EMPLOYEE;
 
-
-
-
-
-
-
+SELECT EMAIL, INSTR(EMAIL,'@')
+  FROM EMPLOYEE;
+  
+---------------------------------------------------------------------------
+/*
+    * LPAD / RPAD : 문자열을 조회할 때 통일감있게 조회하고자 할 때(반환형 : CHARACTER)
+      
+      [표현법]
+      LPAD/RPAD('문자열', 최종적으로 반환할 문자의 길이, [덧붙이고자하는 문자])
+       - 문자열에 덧붙이고자하는 문자를 왼쪽 또는 오른쪽에 덧붙여서 최종 N길이만큼의 문자열 반환
+*/
+-- EMPLOYEE에서 사원명, 이메일(길이 20, 오른쪽 정렬)
+SELECT EMP_NAME, EMAIL, LPAD(EMAIL, 20)     -- 덧붙이고자하는 문자 생략시 공백으로 채워짐
+  FROM EMPLOYEE;
 
 
 
