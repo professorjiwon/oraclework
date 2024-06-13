@@ -50,6 +50,11 @@ alter user tjoeun default tablespace users quota unlimited on users;
 -- 특정 용량만큼 정해서 할당
 alter user tjoeun quota 30M on users;
 
+-- 춘대학교 사용하려면
+-- 1. 춘 사용자 만들기
+-- 2. chun 접속
+-- 3. table 열기(이때, chun사용자 선택) -> 스크립트로 실행
+
 -- 춘대학교 사용자 만들기
 alter session set "_oracle_script" = true;
 create user chun identified by 1234;
