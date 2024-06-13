@@ -533,13 +533,13 @@ SELECT NULLIF('1234','5678') FROM DUAL;
 --                                                          선택 함수
 --========================================================================= 
 /*
-    * DECODE(비교하고자하는 대상(컬럼|산술연산|함수식), 비교값1, 결과값1, 비교값2, 결과값2, ...)
+    * DECODE(비교하고자하는 대상(컬럼|산술연산|함수식), 비교값1, 결과값1, 비교값2, 결과값2, ... ,결과값N)
     
       SWITCH(비교대상) {
         CASE 비교값1 : 결과값1
         CASE 비교값2 : 결과값2
         ...
-        DEFAULT : 
+        DEFAULT : 결과값N
       }         
 */
 -- EMPLOYEE에서 사번, 사원명, 주민번호, 성별(남,여) 조회
@@ -551,6 +551,82 @@ SELECT EMP_ID, EMP_NAME, EMP_NO,  DECODE(SUBSTR(EMP_NO,8,1),'1','남','2','여',
     --  J6인 사원은 급여를 15%인상 (SALARY * 1.15)
     --  J5인 사원은 급여를 20%인상 (SALARY * 1.2)
     --  그외의 사원은 급여를 5%인상 (SALARY * 1.05)
+SELECT EMP_NAME, SALARY, JOB_CODE,
+            DECODE(JOB_CODE, 'J7', SALARY*1.1,
+                                          'J6', SALARY*1.15,
+                                          'J5', SALARY*1.2,
+                                                SALARY*1.05) "인상된 급여"
+  FROM EMPLOYEE;
+
+-------------------------------------------------------------------------------------------------------------------
+/*
+    * CASE WHEN THEN
+      END
+      
+      CASE WHEN 조건식1 THEN 결과값1
+               WHEN 조건식2 THEN 결과값2
+               ...
+               ELSE 결과값N
+       END 
+       
+       IF(조건식1) 결과값1
+       ELSE IF(조건식2) 결과값2
+       ...
+       ELSE 결과값N
+*/ 
+
+-- EMPLOYEE에서 사원명, 급여, 급수(급여가 5백만원 이상이면 '고급' 그렇지 않고 3백5십만원 이상이면 '중급' 나머지는 '초급')
+SELECT EMP_NAME, SALARY,
+   CASE WHEN SALARY >= 5000000 THEN '고급'
+           WHEN SALARY >= 3500000 THEN '중급'
+           ELSE '초급'
+   END 급수
+FROM EMPLOYEE;
+
+--=========================================================================
+--                                                          그룹 함수
+--========================================================================= 
+/*
+    * SUM(컬럼) : 컬럼들의 값의 합계
+*/
+-- 전 사원의 총급여의 합조회
+SELECT SUM(SALARY)
+  FROM EMPLOYEE;
+  
+-- 남자 사원의 총 급여의 합
+SELECT SUM(SALARY)
+  FROM EMPLOYEE
+ WHERE SUBSTR(EMP_NO, 8, 1) IN('1','3');
+ 
+-- 부서코드가 D5인 사원의 연봉(보너스포함)의 합
+SELECT SUM(SALARY*12)
+FROM EMPLOYEE
+WHERE DEPT_CODE='D5';
+
+SELECT SUM(SALARY*NVL(1+BONUS, 1)*12)
+FROM EMPLOYEE
+WHERE DEPT_CODE='D5';
+
+SELECT TO_CHAR(SUM(SALARY*NVL(1+BONUS, 1)*12), 'L999,999,999') "총 급여액"
+FROM EMPLOYEE
+WHERE DEPT_CODE='D5';
+
+-------------------------------------------------------------------------------------------------------------------
+/*
+    * AVG(컬럼) : 해당 컬럼들의 평균
+*/
+SELECT AVG(SALARY)
+ FROM EMPLOYEE;
+ 
+SELECT ROUND(AVG(SALARY))
+ FROM EMPLOYEE;
+
+SELECT ROUND(AVG(SALARY),-1)
+ FROM EMPLOYEE;
+
+
+
+
 
 
 
