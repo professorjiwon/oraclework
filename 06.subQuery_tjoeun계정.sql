@@ -186,7 +186,14 @@ WHERE JOB_NAME = '대리'
                                       JOIN JOB USING (JOB_CODE)
                                     WHERE JOB_NAME = '과장');
 
-
-
+-- 단일행 쿼리로도 가능
+SELECT EMP_ID, EMP_NAME, JOB_NAME, SALARY
+ FROM EMPLOYEE
+ JOIN JOB USING (JOB_CODE)
+WHERE JOB_NAME = '대리' 
+    AND SALARY > (SELECT MIN(SALARY)
+                              FROM EMPLOYEE
+                                JOIN JOB USING (JOB_CODE)
+                            WHERE JOB_NAME = '과장');
 
 
