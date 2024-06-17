@@ -224,8 +224,180 @@ WHERE (DEPT_CODE, JOB_CODE) = (SELECT DEPT_CODE, JOB_CODE
                                                     WHERE EMP_NAME = '장정보');
                                                     
 -- 지정보 사원과 같은 직급코드, 같은 사수를 가지고 있는 사원들의 사번, 사원명, 직급코드, 사수번호 조회                                                   
+SELECT EMP_ID, EMP_NAME, DEPT_CODE, MANAGER_ID
+ FROM EMPLOYEE
+WHERE(DEPT_CODE, MANAGER_ID) = (SELECT DEPT_CODE, MANAGER_ID
+                                                         FROM EMPLOYEE
+                                                        WHERE EMP_NAME='지정보');
+
+ -------------------------------------------------------------------------------------------------------------------
+/*
+    4. 다중행 다중열 서브쿼리
+       : 결과값이 여러행이고 컬럼수가 여러개 일 때
+*/
+
+-- 1) 각 직급별 최소급여 금액을 받는 사원의 사번, 사원명, 직급코드, 급여 조회
+--    1.1 각 직급별 최소금여
+SELECT JOB_CODE, MIN(SALARY)
+ FROM EMPLOYEE
+GROUP BY JOB_CODE; 
+
+SELECT EMP_ID, EMP_NAME, JOB_CODE, SALARY
+ FROM EMPLOYEE
+GROUP BY JOB_CODE = 'J1' AND SALARY = 8000000 
+          OR JOB_CODE = 'J2' AND SALARY = 3700000
+          ....;
+
+SELECT EMP_ID, EMP_NAME, JOB_CODE, SALARY
+ FROM EMPLOYEE
+WHERE (JOB_CODE, SALARY) = ('J1', 8000000)
+      OR (JOB_CODE, SALARY) = ('J2', 3700000)
+       ....;
+
+-- 서브쿼리
+SELECT EMP_ID, EMP_NAME, JOB_CODE, SALARY
+ FROM EMPLOYEE
+WHERE (JOB_CODE, SALARY) IN (SELECT JOB_CODE, MIN(SALARY)
+                                                FROM EMPLOYEE
+                                                GROUP BY JOB_CODE);
+                                                
+-- 2) 각 부서별 최고급여를 받는 사원들의 사번, 사원명, 부서코드, 급여조회
+SELECT EMP_ID, EMP_NAME, DEPT_CODE, SALARY
+ FROM EMPLOYEE
+WHERE(DEPT_CODE, SALARY) IN (SELECT DEPT_CODE, MAX(SALARY) 
+                                                FROM EMPLOYEE
+                                                GROUP BY DEPT_CODE);
+                                                
+--=================================================================
+-- 인라인 뷰
+
+/*
+    인라인 뷰(INLINE VIEW)
+    : 서브쿼리를 수행한 결과를 마치 테이블처럼 사용
+      FROM절에 서브쿼리  작성
+      
+    - 주로 사용하는 예 : TOP-N분석(상위 몇위만 가져오기)
+*/
+-- 1) 사원들의 사번, 이름, 보너스를포함한연봉, 부서코드 조회(연봉에 NULL이 안나오게)
+--      단, 보너스포함 연봉이 3000만원이상인 사원들만 조회
+                                                
+SELECT EMP_ID, EMP_NAME, (SALARY * NVL(1+BONUS,1))*12 연봉, DEPT_CODE
+FROM EMPLOYEE
+-- WHERE 연봉 >= 30000000    오류 순서 FROM -> WHERE
+WHERE (SALARY * NVL(1+BONUS,1))*12 >= 30000000;
+                                                
+-- 별칭을 사용하려면 INLINE VIEW 사용
+SELECT *
+FROM (SELECT EMP_ID, EMP_NAME, (SALARY * NVL(1+BONUS,1))*12 연봉, DEPT_CODE
+            FROM EMPLOYEE)
+WHERE 연봉 >= 30000000;
+
+SELECT EMP_ID, EMP_NAME, 연봉
+FROM (SELECT EMP_ID, EMP_NAME, (SALARY * NVL(1+BONUS,1))*12 연봉, DEPT_CODE
+            FROM EMPLOYEE)
+WHERE 연봉 >= 30000000;
+
+/*
+SELECT EMP_ID, EMP_NAME, 연봉, HIRE_DATE
+FROM (SELECT EMP_ID, EMP_NAME, (SALARY * NVL(1+BONUS,1))*12 연봉, DEPT_CODE
+            FROM EMPLOYEE)
+WHERE 연봉 >= 30000000;  --  FROM절 뒤의 테이블에 HIRE_DATE라는 컬럼은 없다
+*/
+
+-- TOP-N분석
+-- 전 직원중 급여가 가장 높은 상위 5명만 조회
+-- * ROWNUM : 오라클에서 제공해주는 컬럼, 조회된 순서대로 1부터 순번을 부여
+
+SELECT ROWNUM, EMP_ID, EMP_NAME, SALARY
+FROM EMPLOYEE;
+
+SELECT ROWNUM, EMP_ID, EMP_NAME, SALARY
+FROM EMPLOYEE
+ORDER BY SALARY DESC;  -- FROM -> SELECT -> ORDER
+
+SELECT ROWNUM, EMP_ID, EMP_NAME, SALARY
+FROM EMPLOYEE
+WHERE ROWNUM <= 10
+ORDER BY SALARY DESC;
 
 
+-- ORDER BY를 한후, ROWNUM을 붙여줘야 한다
+SELECT *
+ FROM (SELECT EMP_ID, EMP_NAME, SALARY
+            FROM EMPLOYEE
+            ORDER BY SALARY DESC);
+
+SELECT ROWNUM, EMP_ID, EMP_NAME, SALARY
+ FROM (SELECT EMP_ID, EMP_NAME, SALARY
+            FROM EMPLOYEE
+            ORDER BY SALARY DESC)
+WHERE ROWNUM <= 5;
+
+SELECT ROWNUM, *
+ FROM (SELECT EMP_ID, EMP_NAME, SALARY
+            FROM EMPLOYEE
+            ORDER BY SALARY DESC)
+WHERE ROWNUM <= 5;  -- 오류
+
+-- 테이블에 별칭을 부여하면 가능
+SELECT ROWNUM, E.*
+ FROM (SELECT EMP_ID, EMP_NAME, SALARY
+            FROM EMPLOYEE
+            ORDER BY SALARY DESC) E
+WHERE ROWNUM <= 5;
+
+-- 2) 가장 최근에 입사한 사원 5명의 사원명, 급여, 입사일 조회
+--     2.1 입사일 기준 내림차순 정렬한 INLINE VIEW
+SELECT EMP_NAME, SALARY, HIRE_DATE
+ FROM (SELECT *
+            FROM EMPLOYEE
+            ORDER BY HIRE_DATE DESC);
+
+--    2.2          
+SELECT ROWNUM, EMP_NAME, SALARY, HIRE_DATE
+ FROM (SELECT *
+            FROM EMPLOYEE
+            ORDER BY HIRE_DATE DESC)
+WHERE ROWNUM <= 5;            
+            
+            
+-- 3) 각 부서별 평균급여가 높은 3개 부서의 부서코드, 평균급여 조회
+SELECT *
+ FROM (SELECT DEPT_CODE, CEIL(AVG(SALARY)) 평균급여
+            FROM EMPLOYEE
+            GROUP BY DEPT_CODE
+            ORDER BY 평균급여 DESC)
+WHERE ROWNUM <= 3;
+
+ -------------------------------------------------------------------------------------------------------------------
+/*
+    * WITH
+      : 서브쿼리에 이름을 붙여주고 인라인 뷰로 사용시 서브쿼리의 이름으로 FROM절에 기술
+      
+      - 장점
+        같은 서브쿼리가 여러번 사용될 경우 중복 작성을 피할 수 있고, 실행속도가 빠르다
+*/
+WITH TOPN_SAL AS (SELECT DEPT_CODE, CEIL(AVG(SALARY)) 평균급여
+                                FROM EMPLOYEE
+                                GROUP BY DEPT_CODE
+                                ORDER BY 평균급여 DESC)
+                            
+SELECT *
+ FROM TOPN_SAL
+WHERE ROWNUM <= 3; 
+
+-- 실행시 세미콜론이 붙으면(끝) 그 테이블 사용할 수 없음
+-- UNION, MINUS 나 이런식으로 FROM절에 2번 쓸 때 가능
+SELECT *
+ FROM TOPN_SAL
+WHERE ROWNUM <= 5; 
+
+--=================================================================
+/*
+    * 순위 매기는 함수(WINDOW FUNCTION)
+      RANK() OVER(정렬기준) | DENSE_RANK() OVER(정렬기준
+      - 
+*/
 
 
 
