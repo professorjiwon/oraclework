@@ -395,14 +395,57 @@ WHERE ROWNUM <= 5;
 --=================================================================
 /*
     * 순위 매기는 함수(WINDOW FUNCTION)
-      RANK() OVER(정렬기준) | DENSE_RANK() OVER(정렬기준
-      - 
+      RANK() OVER(정렬기준) | DENSE_RANK() OVER(정렬기준)
+      - RANK() OVER(정렬기준) : 동일한 순위 이후의 등수를 동일한 인원 수 만큼 건너뛰고 순위 계산
+                                            ex) 공동1위가 2명이면 그 다음 순위는 3위
+      - DENSE_RANK() OVER(정렬기준)  :  동일한 순위 이후 그 다음 등수를 무조건 1씩 증가시킴
+                                            ex) 공동1위가 2명이면 그 다음 순위는 2위      
+      
 */
+-- 급여가 높은 순서대로 순위 매겨서 사원명, 급여, 순위 조회
+SELECT EMP_NAME, SALARY, RANK() OVER(ORDER BY SALARY DESC) 순위
+ FROM EMPLOYEE;
 
+SELECT EMP_NAME, SALARY, DENSE_RANK() OVER(ORDER BY SALARY DESC) 순위
+ FROM EMPLOYEE;
+ 
+-- 급여가 상위 5위인 사람의 사원명, 급여, 순위 조회
+SELECT EMP_NAME, SALARY, RANK() OVER(ORDER BY SALARY DESC) 순위
+ FROM EMPLOYEE
+WHERE RANK() OVER(ORDER BY SALARY DESC) <= 5;  -- 오류
+-- 윈도우 함수는 WHERE절에서는 사용 못함. SELECT절에서만 사용가능
 
+-->> 인라인 뷰를 사용하면 됨
+SELECT *
+ FROM (SELECT EMP_NAME, SALARY, RANK() OVER(ORDER BY SALARY DESC) 순위
+            FROM EMPLOYEE)
+WHERE 순위 <= 5;
 
+-->> WITH와 같이 사용
+WITH TOPN_SALARY AS(SELECT EMP_NAME, SALARY, RANK() OVER(ORDER BY SALARY DESC) 순위
+                                    FROM EMPLOYEE)
+                                    
+SELECT *
+ FROM TOPN_SALARY
+WHERE 순위 <= 5;
 
-
-
-
+--------------------------------------------------------- 연습문제 --------------------------------------------------------
+-- 1. 2020년 12월 25일의 요일 조회
+-- 2. 70년대 생(1970~1979) 중 여자이면서 전씨인 사원의 사원명, 주민번호, 부서명, 직급명 조회    
+-- 3. 나이가 가장 막내의 사번, 사원명, 나이, 부서명, 직급명 조회
+-- 4. 이름에 ‘하’가 들어가는 사원의 사번, 사원명, 직급명 조회
+-- 5. 부서 코드가 D5이거나 D6인 사원의 사원명, 직급명, 부서코드, 부서명 조회
+-- 6. 보너스를 받는 사원의 사원명, 보너스, 부서명, 지역명 조회
+-- 7. 모든 사원의 사원명, 직급명, 부서명, 지역명 조회
+-- 8. 한국이나 일본에서 근무 중인 사원의 사원명, 부서명, 지역명, 국가명 조회 
+-- 9. 하정연 사원과 같은 부서에서 일하는 사원의 사원명, 부서코드 조회
+-- 10. 보너스가 없고 직급 코드가 J4이거나 J7인 사원의 사원명, 직급명, 급여 조회 (NVL 이용)
+-- 11. 퇴사 하지 않은 사람과 퇴사한 사람의 수 조회
+-- 12. 보너스 포함한 연봉이 높은 5명의 사번, 사원명, 부서명, 직급명, 입사일, 순위 조회
+-- 13. 부서 별 급여 합계가 전체 급여 총 합의 20%보다 많은 부서의 부서명, 부서별 급여 합계 조회
+--	13-1. JOIN과 HAVING 사용                
+--	13-2. 인라인 뷰 사용      
+--	13-3. WITH 사용
+-- 14. 부서명별 급여 합계 조회(NULL도 조회되도록)
+-- 15. WITH를 이용하여 급여합과 급여평균 조회
 
