@@ -89,7 +89,7 @@ WHERE SALARY > (SELECT SALARY
                              FROM EMPLOYEE
                              WHERE EMP_NAME = '박정보');
                              
--- 5) 왕정보사원과 같은 부서코드가 같은 사원들의 사번, 사원명, 전화번호, 입사일, 부서명 조회(단, 왕정보는 제외)
+-- 5) 왕정보 사원과 부서코드가 같은 사원들의 사번, 사원명, 전화번호, 입사일, 부서명 조회(단, 왕정보는 제외)
 --    >> 오라클전용 구문
 SELECT EMP_ID, EMP_NAME, PHONE, HIRE_DATE, DEPT_TITLE
  FROM EMPLOYEE, DEPARTMENT
@@ -195,5 +195,42 @@ WHERE JOB_NAME = '대리'
                               FROM EMPLOYEE
                                 JOIN JOB USING (JOB_CODE)
                             WHERE JOB_NAME = '과장');
+
+ -------------------------------------------------------------------------------------------------------------------
+/*
+    3. 다중열 서브쿼리
+       : 결과값이 한행이고 컬럼수가 여러개 일 때
+*/
+-- 1) 장정보 사원과 같은 부서코드, 같은 직급코드에 해당하는 사원들의 사원명, 부서코드, 직급코드, 입사일 조회
+--     1.1  장정보 사원의 부서코드, 직급코드
+SELECT DEPT_CODE, JOB_CODE
+FROM EMPLOYEE
+WHERE EMP_NAME = '장정보';
+
+SELECT EMP_NAME, DEPT_CODE, JOB_CODE, HIRE_DATE
+ FROM EMPLOYEE
+WHERE DEPT_CODE = (SELECT DEPT_CODE
+                                  FROM EMPLOYEE
+                                 WHERE EMP_NAME = '장정보')
+   AND JOB_CODE = (SELECT JOB_CODE
+                                  FROM EMPLOYEE
+                                 WHERE EMP_NAME = '장정보');
+
+-- 다중열 서브쿼리
+SELECT EMP_NAME, DEPT_CODE, JOB_CODE, HIRE_DATE
+ FROM EMPLOYEE
+WHERE (DEPT_CODE, JOB_CODE) = (SELECT DEPT_CODE, JOB_CODE
+                                                     FROM EMPLOYEE
+                                                    WHERE EMP_NAME = '장정보');
+                                                    
+-- 지정보 사원과 같은 직급코드, 같은 사수를 가지고 있는 사원들의 사번, 사원명, 직급코드, 사수번호 조회                                                   
+
+
+
+
+
+
+
+
 
 
