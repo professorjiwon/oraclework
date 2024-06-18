@@ -165,6 +165,7 @@ INSERT INTO MEM_UNIQUE2 VALUES (2, 'user01', 'pass01', '채규태', '여', '010-
 -- 오류 UNIQUE 제약조건 위배
 
 -- 테이블 레벨 방식
+-- 각 컬럼별로 중복값 확인
 CREATE TABLE MEM_UNIQUE3(
     MEM_NO NUMBER NOT NULL,
     MEM_ID VARCHAR(20) NOT NULL,
@@ -178,6 +179,7 @@ CREATE TABLE MEM_UNIQUE3(
 );
 
 -- 테이블 레벨 방식
+-- 2개의 컬럼을 묶어서 중복값 확인( ex) (1, user01) != (1, user02)  )
 CREATE TABLE MEM_UNIQUE4(
     MEM_NO NUMBER NOT NULL,
     MEM_ID VARCHAR(20) NOT NULL,
