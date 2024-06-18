@@ -299,3 +299,105 @@ INSERT INTO MEM_PRIMARY3 VALUES(2, 'user03', 'pass03', '이고잉', '여', null,
         2, B
         2, C
 */
+
+CREATE TABLE TB_LIKE(
+    MEM_NO NUMBER,
+    PRODUCT_NAME VARCHAR2(20),
+    LIKE_DATE DATE,
+    PRIMARY KEY(MEM_NO, PRODUCT_NAME)
+);
+
+INSERT INTO TB_LIKE VALUES(1, 'A', SYSDATE);
+INSERT INTO TB_LIKE VALUES(1, 'B', SYSDATE);
+
+INSERT INTO TB_LIKE VALUES(2, 'A', SYSDATE);
+INSERT INTO TB_LIKE VALUES(2, 'B', SYSDATE);
+
+-- 복합키 제약조건 오류
+INSERT INTO TB_LIKE VALUES(1, 'A', SYSDATE);
+INSERT INTO TB_LIKE VALUES(2, 'B', SYSDATE);
+
+-- 복합키도 기본키이기 때문에 NOT NULL + UNIQUE 다 맞아야 됨
+--  각 컬럼은 NULL값 안되고, 2개의 컬럼을 합쳐서 유일해야 됨
+INSERT INTO TB_LIKE VALUES(3, NULL, SYSDATE);
+
+--===================================================================
+-- 회원등급 테이블과 회원테이블 2개 생성
+-- 회원 등급 테이블
+CREATE TABLE MEM_GRADE(
+    GRADE_CODE NUMBER PRIMARY KEY,
+    GRADE_NAME VARCHAR2(30) NOT NULL
+);
+INSERT INTO MEM_GRADE VALUES(10, '일반회원');
+INSERT INTO MEM_GRADE VALUES(20, '우수회원');
+INSERT INTO MEM_GRADE VALUES(30, '특별회원');
+
+-- 회원 테이블
+CREATE TABLE MEM(
+    MEM_NO NUMBER CONSTRAINT PK PRIMARY KEY,
+    MEM_ID VARCHAR(20) NOT NULL UNIQUE,
+    MEM_PW VARCHAR(20) NOT NULL,
+    MEM_NAME VARCHAR2(20) NOT NULL,
+    GENDER CHAR(3) CONSTRAINT GEN CHECK(GENDER IN ('남', '여')),
+    GRADE_ID NUMBER  
+);
+
+INSERT INTO MEM VALUES(1, 'user01', 'pass01', '이고잉', '여', 10);
+INSERT INTO MEM VALUES(2, 'user02', 'pass02', '우재남', '남', 30);
+INSERT INTO MEM VALUES(3, 'user03', 'pass03', '채규태', '남', 100);
+-- 유효한 회원등급번호가 아님에도 불구하고 입력됨
+
+----------------------------------------------------------------------------------------------------------------------------------------------
+/*
+    * 외래키(FOREIGN KEY) 제약조건
+      : 다른 테이블에 존재하는 값만 들어와야되는 특정컬럼에 부여하는 제약조건
+       --> 다른 테이블을 참조한다고 표현
+       --> 주로 외래키 제약조건에 의해 테이블 간의 관계가 형성됨
+       
+     >> 컬럼 레벨 방식
+           컬럼명 자료형 [CONSTRAINT 제약조건명] REFERENCES 참조할테이블명 [(참조할컬럼명)]
+           
+     >> 테이블 레벨 방식
+          [CONSTRAINT 제약조건명] FOREIGN KEY(컬럼명) REFERENCES 참조할테이블명 [(참조할컬럼명)]      
+*/
+
+CREATE TABLE MEM2(
+    MEM_NO NUMBER PRIMARY KEY,
+    MEM_ID VARCHAR(20) NOT NULL UNIQUE,
+    MEM_PW VARCHAR(20) NOT NULL,
+    MEM_NAME VARCHAR2(20) NOT NULL,
+    GENDER CHAR(3) CHECK(GENDER IN ('남', '여')),
+    GRADE_ID NUMBER REFERENCES MEM_GRADE(GRADE_CODE)     -- 컬럼 레벨 방식
+--    , FOREIGN KEY(GRADE_ID) REFERENCES MEM_GRADE(GRADE_CODE)   -- 테이블 레벨 방식
+);
+INSERT INTO MEM2 VALUES(1, 'user01', 'pass01', '이고잉', '여', 10);
+INSERT INTO MEM2 VALUES(2, 'user02', 'pass02', '우재남', '남', 30);
+INSERT INTO MEM2 VALUES(3, 'user03', 'pass03', '채규태', '남', NULL);
+-- 외래키 제약조건은 기본적으로 NULL값을 허용함
+
+INSERT INTO MEM2 VALUES(3, 'user03', 'pass03', '채규태', '남', 100);
+--  외래키 제약조건 위배
+--  MEM_GRADE(부모테이블) -|--------<-- MEM2 (자식테이블)
+
+--> 이때 부모테이블에서 데이터값을 삭제할 경우 문제 발생
+--  데이터삭제 : DELETE FROM 테이블명 WHERE 조건;
+
+-- 자식테이블에서 사용하지 않는 컬럼값은 삭제 가능
+DELETE FROM MEM_GRADE
+WHERE GRADE_CODE = 20;
+
+-- 자식테이블에서 사용하고 있는 컬럼값은 삭제 불가
+DELETE FROM MEM_GRADE
+WHERE GRADE_CODE = 10;
+
+----------------------------------------------------------------------------------------------------------------------------------------------
+/*
+    * 자식테이블 생성시 외래키 제약조건 부여할 때 삭제옵션 지정 가능
+      - 삭제 옵션 : 부모테이블의 데이터 삭제 시 자식테이블이 사용하고 있는 값을 어떻게 처리할지
+      
+      1) ON DELETE RESTRICTED(기본값) : 삭제 제한 옵션으로, 자식테이블이 쓰고 있는 값이면 부모테이블에서 삭제 안됨
+      2) ON DELETE SET NULL : 부모테이블의 데이터 삭제시 자식테이블이 쓰고 있는 값들을 NULL로 변경하고 부모테이블의 행 삭제
+      3) ON DELETE CASCADE : 부모테이블의 데이터 삭제시 자식테이블이 쓰고 있는 행도 삭제
+*/
+
+
