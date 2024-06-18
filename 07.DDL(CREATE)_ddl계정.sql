@@ -193,3 +193,103 @@ CREATE TABLE MEM_UNIQUE4(
 INSERT INTO MEM_UNIQUE4 VALUES (1, 'user01', 'pass01', '이고잉', '여', '010-1234-5678', 'user01@gmail.com');
 INSERT INTO MEM_UNIQUE4 VALUES (2, 'user01', 'pass01', '채규태', '여', '010-1234-5678', 'user01@gmail.com');
 
+INSERT INTO MEM_UNIQUE4 VALUES (3, 'user03', 'pass03', '우재남', 'ㄴ', '010-1234-5678', 'user01@gmail.com');
+-- > 성별이 유효한 값이 아니어도 들어감
+
+----------------------------------------------------------------------------------------------------------------------------------------------
+/*
+    * CHECK(조건식) 제약조건
+      : 사용자가 정의 제약조건을 넣고 싶을 때
+*/
+-- 컬럼 레벨 방식
+CREATE TABLE MEM_CHECK(
+    MEM_NO NUMBER NOT NULL,
+    MEM_ID VARCHAR2(20) NOT NULL UNIQUE,
+    MEM_PWD VARCHAR2(20) NOT NULL,
+    MEM_NAME VARCHAR2(20) NOT NULL,
+    GENDER CHAR(3) CHECK(GENDER IN ('남','여')),
+    PHONE VARCHAR2(13),
+    EMAIL VARCHAR2(50)
+);
+
+-- 테이블 레벨 방식
+CREATE TABLE MEM_CHECK2(
+    MEM_NO NUMBER NOT NULL,
+    MEM_ID VARCHAR2(20) NOT NULL,
+    MEM_PWD VARCHAR2(20) NOT NULL,
+    MEM_NAME VARCHAR2(20) NOT NULL,
+    GENDER CHAR(3),
+    PHONE VARCHAR2(13),
+    EMAIL VARCHAR2(50),
+    UNIQUE (MEM_ID),
+    CHECK(GENDER IN ('남','여'))
+);
+
+INSERT INTO MEM_CHECK VALUES(1, 'user01', 'pass01', '이고잉', '여', '010-1234-5678', 'user01@gmail.com');
+INSERT INTO MEM_CHECK VALUES(2, 'user02', 'pass02', '우재남', 'ㄴ', '010-1234-5678', 'user02@gmail.com');
+-- CHECK 제약조건에 위배
+
+----------------------------------------------------------------------------------------------------------------------------------------------
+/*
+    * PRIMARY KEY(기본키) 제약조건
+      : 테이블에서 각 행들을 식별하기 위해 사용될 컬럼에 부여하는 제약조건(식별자 역할)
+      
+      EX) 회원번호, 학번, 사원번호, 주문번호, 예약번호, 운송장 번호, .....
+      
+      - PRIMARY KEY(기본키) 제약조건을 부여하면 NOT NULL + UNIQUE 제약조건을 의미
+        >> 대체적으로 검색, 수정, 삭제할 때 기본키의 컬럼값을 이용함
+        
+        ** 주의사항 : 한 테이블당 오로지 1개만 설정 가능
+*/
+-- 컬럼 레벨 방식
+CREATE TABLE MEM_PRIMARY(
+    MEM_NO NUMBER PRIMARY KEY,
+    MEM_ID VARCHAR2(20) NOT NULL UNIQUE,
+    MEM_PWD VARCHAR2(20) NOT NULL,
+    MEM_NAME VARCHAR2(20) NOT NULL,
+    GENDER CHAR(3) CHECK(GENDER IN ('남','여')),
+    PHONE VARCHAR2(13),
+    EMAIL VARCHAR2(50)
+);
+
+-- 테이블 레벨 방식
+-- 제약조건 이름변경 : CONSTRAINT 제약조건의이름 제약조건식
+CREATE TABLE MEM_PRIMARY3(
+    MEM_NO NUMBER,
+    MEM_ID VARCHAR2(20) NOT NULL CONSTRAINT ID_UNIQUE UNIQUE,
+    MEM_PWD VARCHAR2(20) NOT NULL,
+    MEM_NAME VARCHAR2(20) NOT NULL,
+    GENDER CHAR(3) CONSTRAINT MEM_GENDER CHECK(GENDER IN ('남','여')),
+    PHONE VARCHAR2(13),
+    EMAIL VARCHAR2(50),
+    CONSTRAINT MEM_PK PRIMARY KEY(MEM_NO)
+);
+
+INSERT INTO MEM_PRIMARY3 VALUES(1, 'user01', 'pass01', '홍길동', '남', null, null);
+INSERT INTO MEM_PRIMARY3 VALUES(2, 'user02', 'pass02', '우재남', '남', null, null);
+INSERT INTO MEM_PRIMARY3 VALUES(2, 'user03', 'pass03', '이고잉', '여', null, null);
+
+-- 복합키
+-- 기본키를 2개 넣었을 때 2개를 묶어서 하나의 기본키로 설정됨
+-- 테이블 레벨 방식으로만 가능
+CREATE TABLE MEM_PRIMARY4(
+    MEM_NO NUMBER,
+    MEM_ID VARCHAR2(20) NOT NULL CONSTRAINT ID_UNIQUE UNIQUE,
+    MEM_PWD VARCHAR2(20) NOT NULL,
+    MEM_NAME VARCHAR2(20) NOT NULL,
+    GENDER CHAR(3) CONSTRAINT MEM_GENDER CHECK(GENDER IN ('남','여')),
+    PHONE VARCHAR2(13),
+    EMAIL VARCHAR2(50),
+    CONSTRAINT PK PRIMARY KEY(MEM_NO, MEM_ID)
+);
+
+/*
+    - 복합키 사용 예시(찜 기능)
+    
+    1, A    // 2개를 묶어서 하나의 기본키 역할을 함
+    1, B
+    1, A    -- 오류 떠야 됨
+    2, A
+    2, B
+    2, C
+*/
