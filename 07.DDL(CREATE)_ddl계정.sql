@@ -252,8 +252,24 @@ CREATE TABLE MEM_PRIMARY(
     EMAIL VARCHAR2(50)
 );
 
+/*
+    * 제약조건 부여시 제약조건명까지 지어주는 방법
+    
+    >> 컬럼 레벨 방식
+    CREATE TABLE 테이블명(
+        컬럼명 자료형 [CONSTRAINT 제약조건명] 제약조건,
+        컬럼명 자료형
+    );
+    
+    >> 테이블 레벨 방식
+    CREATE TABLE 테이블명(
+        컬럼명 자료형,
+        컬럼명 자료형,
+        [CONSTRAINT 제약조건명] 제약조건(컬럼명)
+    );
+*/
+
 -- 테이블 레벨 방식
--- 제약조건 이름변경 : CONSTRAINT 제약조건의이름 제약조건식
 CREATE TABLE MEM_PRIMARY3(
     MEM_NO NUMBER,
     MEM_ID VARCHAR2(20) NOT NULL CONSTRAINT ID_UNIQUE UNIQUE,
@@ -269,27 +285,17 @@ INSERT INTO MEM_PRIMARY3 VALUES(1, 'user01', 'pass01', '홍길동', '남', null,
 INSERT INTO MEM_PRIMARY3 VALUES(2, 'user02', 'pass02', '우재남', '남', null, null);
 INSERT INTO MEM_PRIMARY3 VALUES(2, 'user03', 'pass03', '이고잉', '여', null, null);
 
--- 복합키
--- 기본키를 2개 넣었을 때 2개를 묶어서 하나의 기본키로 설정됨
--- 테이블 레벨 방식으로만 가능
-CREATE TABLE MEM_PRIMARY4(
-    MEM_NO NUMBER,
-    MEM_ID VARCHAR2(20) NOT NULL CONSTRAINT ID_UNIQUE UNIQUE,
-    MEM_PWD VARCHAR2(20) NOT NULL,
-    MEM_NAME VARCHAR2(20) NOT NULL,
-    GENDER CHAR(3) CONSTRAINT MEM_GENDER CHECK(GENDER IN ('남','여')),
-    PHONE VARCHAR2(13),
-    EMAIL VARCHAR2(50),
-    CONSTRAINT PK PRIMARY KEY(MEM_NO, MEM_ID)
-);
-
 /*
-    - 복합키 사용 예시(찜 기능)
-    
-    1, A    // 2개를 묶어서 하나의 기본키 역할을 함
-    1, B
-    1, A    -- 오류 떠야 됨
-    2, A
-    2, B
-    2, C
+    * 복합키
+      : 2개이상의 컬럼을 묶어서 하나의 기본키로 설정됨
+      
+      >> 테이블 레벨 방식으로만 가능
+
+      - 복합키 사용 예시(찜 기능)
+        1, A    --> 2개를 묶어서 하나의 기본키 역할을 함
+        1, B
+        1, A    --> 오류 떠야 됨
+        2, A
+        2, B
+        2, C
 */
