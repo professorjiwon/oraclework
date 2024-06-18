@@ -35,7 +35,7 @@
           >  VARCHAR2 : 최대 4000byte까지 지정 가능
                                  가변길이(들어온 값의 크기에 따라 달라짐)
                                  몇글자 들어올지 모를 때 사용
-        - 숫자(NUMBER)
+        - 숫자(NUMBER) : 정수, 실수, 음수, 양수
         - 날짜(DATE)
 */
 
@@ -61,10 +61,133 @@ SELECT * FROM USER_TABLES;
 -- [참고] USER_TAB_COLUMNS : 이 사용자가 가지고 있는 테이블의 모든 컬럼의 전반적인 구조를 확인할 수 있는 시스템 테이블
 SELECT * FROM USER_TAB_COLUMNS;
 
+----------------------------------------------------------------------------------------------------------------------------------------------
+/*
+    2. 컬럼에 주석 달기
+    
+    [표현법]
+    COMMENT ON COLUMN 테이블명.컬럼명 IS '주석내용';
+    
+    >> 잘못 작성을 했을 때 수정한 후 다시 실행하면 덮어쓰기 됨
+*/
+COMMENT ON COLUMN MEMBER.MEM_ID IS '회원아이디';
+COMMENT ON COLUMN MEMBER.MEM_NO IS '회원번호';
+COMMENT ON COLUMN MEMBER.MEM_PWD IS '회원비밀번호';
+COMMENT ON COLUMN MEMBER.MEM_NAME IS '회원이름';
+COMMENT ON COLUMN MEMBER.GENDER IS '회원성별(남,여)';
+COMMENT ON COLUMN MEMBER.PHONE IS '회원전화번호';
+COMMENT ON COLUMN MEMBER.EMAIL IS '회원이메일';
+COMMENT ON COLUMN MEMBER.MEM_DATE IS '회원가입일';
 
+COMMENT ON COLUMN MEMBER.MEM_DATE IS '가입일';
 
+-- 테이블에 데이터를 추가시키는 구문
+-- INSERT INTO 테이블명 VALUES();
+INSERT INTO MEMBER VALUES(1, 'user01', 'pass01', '홍길동', '남','010-1234-5678', 'user01@naver.com', '24/06/01');
+INSERT INTO MEMBER VALUES(2, 'user02', 'pass02', '남길동', '남',null, NULL, SYSDATE);
 
+INSERT INTO MEMBER VALUES(NULL,NULL, NULL, NULL, NULL,null, NULL, NULL);
 
+----------------------------------------------------------------------------------------------------------------------------------------------
+/*
+     * 제약조건(CONSTRAINTS)
+        - 원하는 데이터값(유효한 형식의 값)만 유지하게 위해 특정 컬럼에 설정하는 제약
+        - 데이터 무결성 보장을 목적으로 한다\
+          : 데이터의 결함이 없는 상태, 즉 데이터가 정확하고 유효하게 유지된 상태
+          1) 개체 무결성 제약 조건 : NOT NULL, UNIQUE, PRIMARY KEY 조건 위배
+          2) 참조 무결성 제약 조건 : FOREIGN KEY(외래키) 조건 위배
+          
+          종류 : NOT NULL, UNIQUE, PRIMARY KEY, CHECK(조건), FOREIGN KEY
+          
+        - 제약조건을 부여하는 방식 2가지
+         1) 컬럼 레벨 방식 : 컬럼명 자료형 옆에 기술
+         2) 테이블 레벨 방식 : 모든 컬럼들을 나열한 후 마지막에 기술
+*/
 
+----------------------------------------------------------------------------------------------------------------------------------------------
 
+/*
+    * NOT NULL 제약조건
+      해당 컬럼에 반드시 값이 존재해야만 할 경우(즉, 컬럼값에 NULL이 들어오면 안됨)
+      삽입/수정시 NULL값을 허용하지 않도록 제한
+      
+      -->> 컬럼 레벨 방식만 가능
+*/
+
+-- NOT NULL 제약조건 
+CREATE TABLE MEM_NOTNULL (
+    MEM_NO NUMBER NOT NULL,
+    MEM_ID VARCHAR2(20) NOT NULL,
+    MEM_PWD VARCHAR2(20) NOT NULL,
+    MEM_NAME VARCHAR2(20) NOT NULL,
+    GENDER CHAR(3),
+    PHONE VARCHAR2(13),
+    EMAIL VARCHAR2(50)
+);
+
+INSERT INTO MEM_NOTNULL VALUES(1, 'user01', 'pass01', '이고잉', '여', '010-1234-5678', 'user01@gmail.com');
+INSERT INTO MEM_NOTNULL VALUES(2, 'user01', null, '김고잉', '여', null, 'user01@gmail.com');  -- 비밀번호의 null값 허용 안함 오류
+-- NOT NULL 제약조건에 위배되는 오류
+
+INSERT INTO MEM_NOTNULL VALUES(1, 'user01', 'pass03', '김앤북', '여', '010-1234-0000', 'user03@gmail.com');
+
+----------------------------------------------------------------------------------------------------------------------------------------------
+/*
+    * UNIQUE 제약조건
+      : 해당 컬럼에 중복된 값이 들어가서는 안되는 경우
+        삽입/ 수정시 기존에 있는 데이터의 중복값이 있을 경우 오류 발생
+*/
+-- 컬럼 레벨 방식
+CREATE TABLE MEM_UNIQUE(
+    MEM_NO NUMBER NOT NULL,
+    MEM_ID VARCHAR(20) NOT NULL UNIQUE,
+    MEM_PWD VARCHAR(20) NOT NULL,
+    MEM_NAME VARCHAR(20) NOT NULL,
+    GENDER CHAR(3),
+    PHONE VARCHAR(20),
+    EMAIL VARCHAR(50)
+);
+
+-- 테이블 레벨 방식
+CREATE TABLE MEM_UNIQUE2(
+    MEM_NO NUMBER NOT NULL,
+    MEM_ID VARCHAR(20) NOT NULL,
+    MEM_PWD VARCHAR(20) NOT NULL,
+    MEM_NAME VARCHAR(20) NOT NULL,
+    GENDER CHAR(3),
+    PHONE VARCHAR(20),
+    EMAIL VARCHAR(50),
+    UNIQUE (MEM_ID)
+);
+
+INSERT INTO MEM_UNIQUE2 VALUES (1, 'user01', 'pass01', '이고잉', '여', '010-1234-5678', 'user01@gmail.com');
+INSERT INTO MEM_UNIQUE2 VALUES (2, 'user01', 'pass01', '채규태', '여', '010-1234-5678', 'user01@gmail.com');
+-- 오류 UNIQUE 제약조건 위배
+
+-- 테이블 레벨 방식
+CREATE TABLE MEM_UNIQUE3(
+    MEM_NO NUMBER NOT NULL,
+    MEM_ID VARCHAR(20) NOT NULL,
+    MEM_PWD VARCHAR(20) NOT NULL,
+    MEM_NAME VARCHAR(20) NOT NULL,
+    GENDER CHAR(3),
+    PHONE VARCHAR(20),
+    EMAIL VARCHAR(50),
+    UNIQUE (MEM_NO),
+    UNIQUE (MEM_ID)
+);
+
+-- 테이블 레벨 방식
+CREATE TABLE MEM_UNIQUE4(
+    MEM_NO NUMBER NOT NULL,
+    MEM_ID VARCHAR(20) NOT NULL,
+    MEM_PWD VARCHAR(20) NOT NULL,
+    MEM_NAME VARCHAR(20) NOT NULL,
+    GENDER CHAR(3),
+    PHONE VARCHAR(20),
+    EMAIL VARCHAR(50),
+    UNIQUE (MEM_NO, MEM_ID)
+); 
+INSERT INTO MEM_UNIQUE4 VALUES (1, 'user01', 'pass01', '이고잉', '여', '010-1234-5678', 'user01@gmail.com');
+INSERT INTO MEM_UNIQUE4 VALUES (2, 'user01', 'pass01', '채규태', '여', '010-1234-5678', 'user01@gmail.com');
 
