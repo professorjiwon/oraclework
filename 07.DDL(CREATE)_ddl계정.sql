@@ -399,5 +399,82 @@ WHERE GRADE_CODE = 10;
       2) ON DELETE SET NULL : 부모테이블의 데이터 삭제시 자식테이블이 쓰고 있는 값들을 NULL로 변경하고 부모테이블의 행 삭제
       3) ON DELETE CASCADE : 부모테이블의 데이터 삭제시 자식테이블이 쓰고 있는 행도 삭제
 */
+DROP TABLE MEM;
+DROP TABLE MEM2;
+
+-- 외래키 생성시 참조테이블명만 넣으면 참조테이블의 기본키의 컬럼이 자동으로 설정됨
+CREATE TABLE MEM(
+    MEM_NO NUMBER PRIMARY KEY,
+    MEM_ID VARCHAR(20) NOT NULL UNIQUE,
+    MEM_PW VARCHAR(20) NOT NULL,
+    MEM_NAME VARCHAR2(20) NOT NULL,
+    GENDER CHAR(3) CHECK(GENDER IN ('남', '여')),
+    GRADE_ID NUMBER REFERENCES MEM_GRADE ON DELETE SET NULL
+);
+
+INSERT INTO MEM VALUES(1, 'user01', 'pass01', '이고잉', '여', 10);
+INSERT INTO MEM VALUES(2, 'user02', 'pass02', '우재남', '남', 30);
+INSERT INTO MEM VALUES(3, 'user03', 'pass03', '송미영', '여', 20);
+INSERT INTO MEM VALUES(4, 'user04', 'pass04', '김앤북', '남', 30);
+INSERT INTO MEM VALUES(5, 'user05', 'pass05', '채규태', '남', NULL);
+
+DELETE FROM MEM_GRADE WHERE GRADE_CODE = 30;
+-- 삭제됨 자식은 NULL값으로 바뀜
+
+DROP TABLE MEM;
+
+CREATE TABLE MEM(
+    MEM_NO NUMBER PRIMARY KEY,
+    MEM_ID VARCHAR(20) NOT NULL UNIQUE,
+    MEM_PW VARCHAR(20) NOT NULL,
+    MEM_NAME VARCHAR2(20) NOT NULL,
+    GENDER CHAR(3) CHECK(GENDER IN ('남', '여')),
+    GRADE_ID NUMBER REFERENCES MEM_GRADE ON DELETE CASCADE
+);
+
+INSERT INTO MEM_GRADE VALUES(30, '특별회원');
+INSERT INTO MEM VALUES(1, 'user01', 'pass01', '이고잉', '여', 10);
+INSERT INTO MEM VALUES(2, 'user02', 'pass02', '우재남', '남', 30);
+INSERT INTO MEM VALUES(3, 'user03', 'pass03', '송미영', '여', 20);
+INSERT INTO MEM VALUES(4, 'user04', 'pass04', '김앤북', '남', 30);
+INSERT INTO MEM VALUES(5, 'user05', 'pass05', '채규태', '남', NULL);
+
+DELETE FROM MEM_GRADE WHERE GRADE_CODE = 30;
+
+----------------------------------------------------------------------------------------------------------------------------------------------
+/*
+    * DEFAULT 값 설정하기
+      컬럼의 값이 들어오지 않았을 때 기본값으로 넣어줌
+      
+      컬럼명 자료형 DEFAULT 기본값 [제약조건]
+*/
+CREATE TABLE MEMBER2 (
+    MEM_NO NUMBER PRIMARY KEY,
+    MEM_ID VARCHAR2(20) NOT NULL,
+    MEM_AGE NUMBER,
+    HOBBY VARCHAR2(20) DEFAULT '없음',
+    MEM_DATE DATE DEFAULT SYSDATE
+);
+INSERT INTO MEMBER2 VALUES(1, 'user01', 25, '잠자기', '24/06/13');
+INSERT INTO MEMBER2 VALUES(2, 'user02', null, null, null);
+INSERT INTO MEMBER2 VALUES(3, 'user03', 27, default, default);
+
+INSERT INTO MEMBER2 (MEM_NO, MEM_ID, MEM_AGE) VALUES(4, 'user04', 25);
+
+
+--=======================================================================
+------------------------------------- tjoeun 계정에서 실행 ---------------------------------------------
+/*
+    * SUBQUERY를 이용한 테이블 생성
+       테이블 복사하는 개념
+       
+       [표현식]
+       CREATE TABLE 테이블명 AS 서브쿼리;     
+*/
+
+
+
+
+
 
 
