@@ -105,9 +105,117 @@ AS SELECT EMP_ID, EMP_NAME, MANAGER_ID
       FROM EMPLOYEE
       WHERE 1=0;
 
+-- 부서코드가 D1인 사원들의 사번, 이름, 부서코드, 입사일, 사수사번 조회
+SELECT EMP_ID, EMP_NAME, DEPT_CODE, HIRE_DATE, MANAGER_ID
+FROM EMPLOYEE
+WHERE DEPT_CODE = 'D1';
 
+INSERT ALL
+INTO EMP_DEPT VALUES(EMP_ID, EMP_NAME, DEPT_CODE, HIRE_DATE)
+INTO EMP_MANAGER VALUES(EMP_ID, EMP_NAME, MANAGER_ID)
+        SELECT EMP_ID, EMP_NAME, DEPT_CODE, HIRE_DATE, MANAGER_ID
+        FROM EMPLOYEE
+        WHERE DEPT_CODE = 'D1';
 
+-------------------------------------------------------------------------------------------------------------------------------
+/*
+    * 조건을 사용하는 INSERT ALL
+        
+       [표현식]
+       INSERT ALL
+       WHEN 조건1 THEN
+                 INTO 테이블명1 VALUES(컬럼명, 컬럼명, ...)
+       WHEN 조건2 THEN
+                 INTO 테이블명2 VALUES(컬럼명, 컬럼명, ...)
+        서브쿼리;
+*/
+-- 2000년도 이전에 입사한 사원들을 저장할 테이블 생성
+CREATE TABLE EMP_OLD
+AS SELECT EMP_ID, EMP_NAME, HIRE_DATE, SALARY
+      FROM EMPLOYEE
+      WHERE 1=0;
 
+-- 2000년도 이후에 입사한 사원들을 저장할 테이블 생성
+CREATE TABLE EMP_NEW
+AS SELECT EMP_ID, EMP_NAME, HIRE_DATE, SALARY
+      FROM EMPLOYEE
+      WHERE 1=0;
+      
+INSERT ALL
+WHEN HIRE_DATE < '2000/01/01' THEN
+        INTO EMP_OLD VALUES(EMP_ID, EMP_NAME, HIRE_DATE, SALARY)
+WHEN HIRE_DATE >= '2000/01/01' THEN
+        INTO EMP_NEW VALUES(EMP_ID, EMP_NAME, HIRE_DATE, SALARY)
+SELECT EMP_ID, EMP_NAME, HIRE_DATE, SALARY
+ FROM EMPLOYEE;
+
+--=====================================================================
+/*
+    * UPDATE
+      테이블의 데이터를 수정하는 구문
+      
+      [표현식]
+      UPDATE 테이블명
+      SET 컬럼명 = 바꿀값,
+            컬럼명 = 바꿀값,
+            ....
+      [WHERE 조건];  --> ** 주의 : 조건을 생략하면 모든행의 데이터가 변경됨
+*/
+-- DEPARTMENT 복사본 테이블 생성
+CREATE TABLE DEPT_COPY
+AS SELECT * FROM DEPARTMENT;
+
+-- D9 부서명을 전략기획부로 변경
+UPDATE DEPT_COPY
+SET DEPT_TITLE = '전략기획부';
+
+ROLLBACK;
+
+UPDATE DEPT_COPY
+SET DEPT_TITLE = '전략기획부'
+WHERE DEPT_ID = 'D9';
+
+-- EMPLOYEE_COPY테이블에서 왕정보의 급여를 1,500,000으로 인상
+UPDATE EMPLOYEE_COPY
+SET SALARY = 1500000
+WHERE EMP_NAME = '왕정보';
+
+-- EMPLOYEE_COPY테이블에서 구정하의 급여를 1,800,000으로 인상하고 보너스는 10%
+UPDATE EMPLOYEE_COPY
+SET SALARY = 1800000,
+      BONUS = 0.1
+WHERE EMP_NAME = '구정하';      
+
+-- EMPLOYEE_COPY테이블에서 전체 사원의 급여를 기존의 급여에 10% 인상한 금액으로 변경
+UPDATE EMPLOYEE_COPY
+SET SALARY = SALARY * 1.1;
+
+-------------------------------------------------------------------------------------------------------------------------------
+/*
+    * 서브쿼리를 사용한 UPDATE
+    
+      [표현식]
+      UPDATE 테이블명
+      SET 컬럼명 = (서브쿼리)
+      [WHERE 조건];
+*/
+-- 이고잉 사원의 급여와 보너스를 전정보사원의 급여와 보너스값으로 변경
+-- 단일행 서브쿼리
+UPDATE EMPLOYEE_COPY
+SET SALARY = (SELECT SALARY
+                        FROM EMPLOYEE_COPY
+                       WHERE EMP_NAME = '전정보'),
+      BONUS = (SELECT BONUS
+                        FROM EMPLOYEE_COPY
+                       WHERE EMP_NAME = '전정보')
+WHERE EMP_NAME = '이고잉';
+
+-- 다중열 서브쿼리 가능
+UPDATE EMPLOYEE_COPY
+SET (SALARY, BONUS) = (SELECT SALARY, BONUS
+                                    FROM EMPLOYEE_COPY
+                                    WHERE EMP_NAME = '전정보')
+WHERE EMP_NAME = '이고잉';
 
 
 
