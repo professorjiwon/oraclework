@@ -92,7 +92,7 @@ INSERT INTO MEMBER VALUES(NULL,NULL, NULL, NULL, NULL,null, NULL, NULL);
 /*
      * 제약조건(CONSTRAINTS)
         - 원하는 데이터값(유효한 형식의 값)만 유지하게 위해 특정 컬럼에 설정하는 제약
-        - 데이터 무결성 보장을 목적으로 한다\
+        - 데이터 무결성 보장을 목적으로 한다
           : 데이터의 결함이 없는 상태, 즉 데이터가 정확하고 유효하게 유지된 상태
           1) 개체 무결성 제약 조건 : NOT NULL, UNIQUE, PRIMARY KEY 조건 위배
           2) 참조 무결성 제약 조건 : FOREIGN KEY(외래키) 조건 위배
@@ -283,7 +283,10 @@ CREATE TABLE MEM_PRIMARY3(
 
 INSERT INTO MEM_PRIMARY3 VALUES(1, 'user01', 'pass01', '홍길동', '남', null, null);
 INSERT INTO MEM_PRIMARY3 VALUES(2, 'user02', 'pass02', '우재남', '남', null, null);
-INSERT INTO MEM_PRIMARY3 VALUES(2, 'user03', 'pass03', '이고잉', '여', null, null);
+
+-- 오류
+INSERT INTO MEM_PRIMARY3 VALUES(2, 'user03', 'pass03', '이고잉', '여', null, null);   -- unique
+INSERT INTO MEM_PRIMARY3 VALUES(null, 'user03', 'pass03', '이고잉', '여', null, null);  -- null
 
 /*
     * 복합키
@@ -354,7 +357,7 @@ INSERT INTO MEM VALUES(3, 'user03', 'pass03', '채규태', '남', 100);
        --> 다른 테이블을 참조한다고 표현
        --> 주로 외래키 제약조건에 의해 테이블 간의 관계가 형성됨
        
-     >> 컬럼 레벨 방식
+     >> 컬럼 레벨 방식 : 참조할컬럼명이 primary key 였을 때 생략 가능
            컬럼명 자료형 [CONSTRAINT 제약조건명] REFERENCES 참조할테이블명 [(참조할컬럼명)]
            
      >> 테이블 레벨 방식
