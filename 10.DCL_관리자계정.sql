@@ -30,5 +30,37 @@ CREATE USER SAMPLE IDENTIFIED BY 1234;
 -- 2. 접속을 위한 권한 부여
 GRANT CREATE SESSION TO SAMPLE;
 
+-- 3. 테이블을 생성할 수 있는 권한 부여
+GRANT CREATE TABLE TO SAMPLE;
+
+-- 4. TABLESPACE 할당
+ALTER USER SAMPLE QUOTA 2M ON USERS;
+ALTER USER SAMPLE DEFAULT TABLESPACE USERS QUOTA UNLIMITED ON USERS;
+
+----------------------------------------------------------------------------------------------------------
+-- 객체 접근
+-- 4. SAMPLE계정에게 TJOEUN계정의 EMPLOYEE을 SELECT할 수 있는 권한
+GRANT SELECT ON TJOEUN.EMPLOYEE TO SAMPLE;
+
+-- 5. SAMPLE계정에 TJOEUN계정의 EMPLOYEE을 INSERT할 수 있는 권한
+GRANT INSERT ON TJOEUN.EMPLOYEE TO SAMPLE;
+
+----------------------------------------------------------------------------------------------------------
+-- 권한 회수
+-- REVOKE 회수할권한 ON 테이블명 FROM 계정명;
+REVOKE SELECT ON TJOEUN.EMPLOYEE FROM SAMPLE;
+REVOKE INSERT ON TJOEUN.EMPLOYEE FROM SAMPLE;
+
+----------------------------------------------------------------------------------------------------------
+/*
+    * ROLE
+      : 특정 권한들을 하나의 집합으로 모아놓은 것
+      
+      CONNECT : CREATE + SESSION
+      RESOURCE : CREATE TABLE + CREATE SEQUENCE + ...
+      DBA : 시스템 및 객체관리에 대한 모든 권한을 갖고 있는 롤
+      
+      GRANT CONNECT, RESOURCE TO 계정명;
+*/
 
 
