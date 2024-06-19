@@ -217,5 +217,63 @@ SET (SALARY, BONUS) = (SELECT SALARY, BONUS
                                     WHERE EMP_NAME = '전정보')
 WHERE EMP_NAME = '이고잉';
 
+-- EMPLOYEE_COPY테이블에서 왕정보, 구정하, 선정보, 전지연, 장정보의 급여와 보너스를
+--    오정보 사원의 급여와 보너스값으로 변경
+UPDATE EMPLOYEE_COPY
+SET (SALARY, BONUS) = (SELECT SALARY, BONUS
+                                    FROM EMPLOYEE_COPY
+                                    WHERE EMP_NAME = '오정보')
+WHERE EMP_NAME IN ('왕정보', '구정하', '선정보', '전지연', '장정보');
+
+-- ASIA 지역에서 근무하는 사원들의 보너스값을 0.3으로 변경(EMPLOYEE_COPY, DEPARTMENT, LOCATION)
+UPDATE EMPLOYEE_COPY
+SET BONUS = 0.3
+WHERE EMP_ID IN (SELECT EMP_ID
+                             FROM EMPLOYEE_COPY
+                             JOIN DEPARTMENT ON (DEPT_CODE = DEPT_ID)
+                             JOIN LOCATION ON(LOCATION_ID = LOCAL_CODE)
+                             WHERE LOCAL_NAME LIKE 'ASIA%');
 
 
+-- UPDATE시에도 제약조건에 위배되면 안됨
+-- 왕정보의 DEPT_CODE를 D10으로 변경
+-- 부모테이블에 D0 없어서 제약조건 위배
+UPDATE EMPLOYEE_COPY
+SET DEPT_CODE = 'D0'
+WHERE EMP_NAME = '왕정보';
+
+-- NOT NULL 제약조건 위배
+UPDATE EMPLOYEE_COPY
+SET EMP_NO = NULL
+WHERE EMP_NAME = '왕정보';
+
+-------------------------------------------------------------------------------------------------------------------------------
+/*
+    * DELETE
+        : 테이블의 데이터를 삭제하는 구문(한 행 단위로 삭제)
+        
+        [표현식]
+        DELETE FROM 테이블명
+        [WHERE 조건]               --> ** 주의 : 조건이 없으면 모든 데이터 삭제
+*/
+DELETE FROM EMPLOYEE_COPY; 
+
+ROLLBACK;
+    
+DELETE FROM EMPLOYEE_COPY
+WHERE EMP_NAME = '왕정보';
+
+DELETE FROM EMPLOYEE_COPY
+WHERE DEPT_CODE IS NULL;
+    
+ROLLBACK;
+
+/*
+     * TRUNCATE : 테이블의 전체 행을 삭제할 때 사용하는 구문
+                          DELETE보다 수행속도가 빠름
+                          
+       TRUNCATE TABLE 테이블명;
+*/    
+TRUNCATE TABLE EMPLOYEE_COPY4;
+ROLLBACK;  --> 롤백 안됨
+    
