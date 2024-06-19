@@ -13,8 +13,7 @@
 ----------------------------------------------------------------------------------------------------------
 /*
     1. 컬럼 추가 / 수정 / 삭제
-*/
-/*
+
         1.1 컬럼 추가 (ADD)  
         
         [표현법]
@@ -36,6 +35,7 @@ ALTER TABLE DEPT_COPY ADD LNAME VARCHAR2(30) DEFAULT '한국';
        - DEFAULT 값 수정
          MODIFY 컬럼명 DEFAULT 바꾸고자하는기본값
 */
+
 -- DEPT_COPY테이블의 DEPT_ID의 자료형 CHAR(3) 변경
 ALTER TABLE DEPT_COPY MODIFY DEPT_ID CHAR(3);
 
@@ -66,7 +66,6 @@ ALTER TABLE DEPT_COPY
 -- DEPT_COPY테이블에서 CNAME컬럼 삭제
 ALTER TABLE DEPT_COPY DROP COLUMN CNAME;
 -- DROP은 다중 삭제 안됨
-
 
 ALTER TABLE DEPT_COPY DROP COLUMN DEPT_TITLE;
 ALTER TABLE DEPT_COPY DROP COLUMN LOCATION_ID;
