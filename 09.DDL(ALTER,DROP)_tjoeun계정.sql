@@ -12,7 +12,7 @@
 */
 ----------------------------------------------------------------------------------------------------------
 /*
-    1) 컬럼 추가 / 수정 / 삭제
+    1. 컬럼 추가 / 수정 / 삭제
 */
 /*
         1.1 컬럼 추가 (ADD)  
@@ -77,27 +77,94 @@ ALTER TABLE DEPT_COPY DROP COLUMN DEPT_ID;  -- 오류
 
 ---------------------------------------------------------------------------------------------------------------------------------
 /*
-    * 제약조건 추가 / 삭제
-      > 제약조건 추가
-           ALTER TABLE 테이블명 변경할 내용
-       - PRIMARY KEY : ALTER TABLE 테이블명 ADD PRIMARY KEY(컬럼명)
-       - FOREIGN KEY : ALTER TABLE 테이블명 ADD FOREIGN KEY(컬럼명) REFERENCES 참조할테이블명 [(참조할컬럼명)]
-       - UNIQUE : ALTER TABLE 테이블명 ADD UNIQUE(컬럼명)
-       - CHECK : ALTER TABLE 테이블명 ADD CHECK(컬럼에 대한 조건식)
-       - NOT NULL : ALTER TABLE 테이블명 MODIFY 컬럼명 NOT NULL
+    2 제약조건 추가 / 삭제
+       2.1 제약조건 추가
+             ALTER TABLE 테이블명 변경할 내용
+            - PRIMARY KEY : ALTER TABLE 테이블명 ADD PRIMARY KEY(컬럼명)
+            - FOREIGN KEY : ALTER TABLE 테이블명 ADD FOREIGN KEY(컬럼명) REFERENCES 참조할테이블명 [(참조할컬럼명)]
+            - UNIQUE : ALTER TABLE 테이블명 ADD UNIQUE(컬럼명)
+            - CHECK : ALTER TABLE 테이블명 ADD CHECK(컬럼에 대한 조건식)
+            - NOT NULL : ALTER TABLE 테이블명 MODIFY 컬럼명 NOT NULL
        
        + 제약조건명을 지정하려면 CONSTRAINT 제약조건명  제약조건
       
-     > 제약조건 삭제
-         DROP CONSTRAINT  제약조건
-         MODIFY 컬럼명 NULL(NOT NULL 제약조건을 NULL 바꿀때)
+      2.2 제약조건 삭제
+           DROP CONSTRAINT  제약조건
+           MODIFY 컬럼명 NULL(NOT NULL 제약조건을 NULL 바꿀때)
 */
 -- DEPARTMENT테이블을 복사하여 DEPT_COPY테이블 생성
-
+CREATE TABLE DEPT_COPY
+AS SELECT *
+     FROM DEPARTMENT;
+     
 -- DEPT_COPY테이블에 LNAME컬럼 추가
-
+ALTER TABLE DEPT_COPY
+        ADD LNAME VARCHAR(30) DEFAULT '미국';
 
 -- DEPT_COPY테이블 제약조건 추가
 -- 1) DEPT_ID컬럼에 기본키
 -- 2) DEPT_TITLE 컬럼에 UNIQUE
 -- 3) LNAME컬럼에 NOT NULL
+
+ALTER TABLE DEPT_COPY
+    ADD CONSTRAINT DCOPY_PK PRIMARY KEY (DEPT_ID)
+    ADD CONSTRAINT DCOPY_UQ UNIQUE(DEPT_TITLE)
+    MODIFY LNAME CONSTRAINT DCOPY_NN NOT NULL;
+    
+-- 제약조건 삭제
+ALTER TABLE DEPT_COPY
+          DROP CONSTRAINT DCOPY_PK;
+          
+ALTER TABLE DEPT_COPY
+          DROP CONSTRAINT DCOPY_UQ
+          MODIFY LNAME NULL;
+    
+---------------------------------------------------------------------------------------------------------------------------------
+/*
+    3. 컬럼명 / 제약조건명 / 테이블명 변경
+    
+        3.1 컬럼명 변경
+        
+              [표현법]
+              RENAME COLUMN 기존컬럼명 TO 바꿀컬럼명
+*/
+-- DEPT_COPY테이블의   DEPT_TITLE컬럼명을 DEPT_NAME으로 변경
+ALTER TABLE DEPT_COPY RENAME COLUMN DEPT_TITLE TO DEPT_NAME;
+
+/*
+        3.2 제약조건명 변경
+        
+              [표현법]
+              RENAME CONSTRAINT 기존제약조건명 TO 바꿀제약조건명
+*/
+-- 제약조건 넣기
+ALTER TABLE DEPT_COPY
+    ADD CONSTRAINT DCOPY_PK PRIMARY KEY (DEPT_ID)
+    ADD CONSTRAINT DCOPY_UQ UNIQUE(DEPT_NAME)
+    MODIFY LNAME CONSTRAINT DCOPY_NN NOT NULL;
+
+-- 제약조건명 변경
+ALTER TABLE DEPT_COPY
+    RENAME CONSTRAINT DCOPY_UQ TO COPY_UNIQUE;
+    
+/*
+        3.3 테이블명 변경
+        
+              [표현법]
+              RENAME [기존테이블명] TO 바꿀테이블명
+*/  
+-- 
+ALTER TABLE DEPT_COPY
+          RENAME TO DEPT_TEST;
+          
+-------------------------------------------------------------------------------------
+-- 테이블 삭제
+DROP TABLE DEPT_TEST;
+
+/*
+    - 테이블 삭제시 외래키의 부모테이블은 삭제 안됨
+      그래도 삭제하고 싶다면
+      * 방법1 : 자식테이블 먼저 삭제한 후 부모테이블 삭제
+      * 방법2 : 부모테이블만 삭제하는데 제약조건 같이 삭제하는 방법
+                    DROP TABLE 부모테이블명 CACADE CONSTRAINT;
+*/
