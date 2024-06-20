@@ -178,7 +178,8 @@ WHERE DEPT_ID = 'D9';
 -- EMPLOYEE_COPY테이블에서 왕정보의 급여를 1,500,000으로 인상
 UPDATE EMPLOYEE_COPY
 SET SALARY = 1500000
-WHERE EMP_NAME = '왕정보';
+WHERE EMP_NAME = '왕정보';  -- 보통 primary key를 이용하여 수정
+                                              -- 이름으로 수정하면 동명이인일 경우 2개의 행이 변경됨
 
 -- EMPLOYEE_COPY테이블에서 구정하의 급여를 1,800,000으로 인상하고 보너스는 10%
 UPDATE EMPLOYEE_COPY
