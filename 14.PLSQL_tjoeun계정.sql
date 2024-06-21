@@ -507,6 +507,71 @@ EXCEPTION
 END;
 /
 
+----------------------------------------------- 연습문제
+/*
+1. 사원의 연봉을 구하는 PL/SQL 작성, 보너스가 있는 사원은 보너스도 포함하여 계산
+
+2. 구구단 짝수단 출력
+	2-1) FOR LOOP
+	2-2) WHILE LOOP
+*/
+
+-- 1.
+DECLARE
+    E EMPLOYEE%ROWTYPE;
+    YEARSAL NUMBER;
+BEGIN
+    SELECT *
+    INTO E
+    FROM EMPLOYEE
+    WHERE EMP_ID = &사번;
+    
+    IF(E.BONUS IS NULL)
+        THEN YEARSAL := E.SALARY * 12;
+    ELSE
+        YEARSAL := E.SALARY * (1+E.BONUS) * 12;
+    END IF;
+    
+    DBMS_OUTPUT.PUT_LINE(E.EMP_NAME || '의 연봉 : ' || TO_CHAR(YEARSAL, 'L999,999,999'));
+END;
+/
+
+-- 2. 짝수 구구단
+-- FOR LOOP
+BEGIN
+    FOR DAN IN 2..9
+    LOOP
+        IF MOD(DAN, 2) = 0
+            THEN
+                FOR SU IN 1..9
+                    LOOP
+                        DBMS_OUTPUT.PUT_LINE(DAN || '*' || SU || '=' || DAN*SU);
+                    END LOOP;
+                 DBMS_OUTPUT.PUT_LINE('');
+        END IF;
+    END LOOP;
+END;
+/
+
+-- WHILE LOOP
+DECLARE
+    DAN NUMBER := 2;
+    SU NUMBER;
+BEGIN
+    WHILE DAN <= 9
+    LOOP
+        SU := 1;
+            WHILE SU <= 9
+            LOOP
+                DBMS_OUTPUT.PUT_LINE(DAN || '*' || SU || '=' || DAN*SU);
+                SU := SU+1;
+            END LOOP;
+            DBMS_OUTPUT.PUT_LINE('');
+            DAN := DAN+2;
+    END LOOP;
+END;
+/
+
 
 
 
