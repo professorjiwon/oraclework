@@ -571,12 +571,3 @@ BEGIN
     END LOOP;
 END;
 /
-
-
-
-
-
-
-
-
-
