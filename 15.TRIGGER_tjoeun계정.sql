@@ -98,3 +98,45 @@ CREATE TABLE TB_PROSALE (
 
 --  2.2 입고번호에 넣을 시퀀스 생성
 CREATE SEQUENCE SEQ_SCODE;
+
+
+----------------------------------------- 입고
+-- 상품번호 200번 상품 10개
+INSERT INTO tb_prostock
+VALUES(SEQ_TCODE.NEXTVAL, 200, SYSDATE, 10, 2100000);
+
+-- 제품테이블에 재고수량 10개 UPDATE
+UPDATE TB_PRODUCT
+    SET stock_quant = stock_quant + 10
+WHERE PCODE = 200;    
+
+COMMIT;
+
+-- 210번 제품이 5개 판매되었다
+INSERT INTO TB_PROSALE
+VALUES(SEQ_SCODE.NEXTVAL, 210, SYSDATE, 5, 350000);
+-- 제품테이블에 재고수량 10개 UPDATE
+UPDATE TB_PRODUCT
+    SET stock_quant = stock_quant - 5
+WHERE PCODE = 210; 
+COMMIT;
+
+-- TB_PRODUCT테이블에 매번 자동으로 재고수량 UPDATE하는 트리거 정의
+
+-- TB_PROSTOCK 테이블에 INSERT이벤트 발생시
+/*
+UPDATE TB_PRODUCT
+    SET STOCK_QUANT = STOCK_QUANT + 입고된 수량(INSERT된 자료의 STOCK_COUNT)
+WHERE PCODE = 입고된상품번호(INSERT된 자료의 PCODE값)    
+*/
+
+
+
+
+
+
+
+
+
+
+
