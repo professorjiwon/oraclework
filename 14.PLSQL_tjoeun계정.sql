@@ -111,5 +111,120 @@ END;
 */
 
 
+---------------------------------------------------------------------------------------------------------------- 
+/*
+    1.3 ROW타입의 변수
+         : 어떤 테이블의 한 행에 대한 모든 컬럼값을 한꺼번에 담을 수 있는 변수
+         
+        [표현식] 
+        변수명  테이블명%ROWTYPE;
+*/
+DECLARE
+    E EMPLOYEE%ROWTYPE;
+BEGIN
+    SELECT *
+       INTO E
+     FROM EMPLOYEE
+    WHERE EMP_ID = &사번;
+    
+    DBMS_OUTPUT.PUT_LINE('사원명 : ' || E.EMP_NAME);
+    DBMS_OUTPUT.PUT_LINE('급여 : ' || E.SALARY);
+    -- DBMS_OUTPUT.PUT_LINE('보너스 : ' || E.BONUS);  성공이긴 하지만 값이 없음
+    -- DBMS_OUTPUT.PUT_LINE('보너스 : ' || NVL(E.BONUS,'없음'));  자료형이 맞지 않아서 오류
+    DBMS_OUTPUT.PUT_LINE('보너스 : ' || NVL(E.BONUS,0));
+END;
+/
+    
+DECLARE
+    E EMPLOYEE%ROWTYPE;
+BEGIN
+    SELECT EMP_NAME, SALARY, BONUS  -- 무조건 * 를 사용해야 됨
+       INTO E
+      FROM EMPLOYEE
+    WHERE EMP_ID = &사번;
+    
+    DBMS_OUTPUT.PUT_LINE('사원명 : ' || E.EMP_NAME);
+    DBMS_OUTPUT.PUT_LINE('급여 : ' || E.SALARY);
+    DBMS_OUTPUT.PUT_LINE('보너스 : ' || NVL(E.BONUS,0));
+END;
+/    
+    
+---------------------------------------------------------------------------------------------------------------- 
+/*
+    2. 실행부
+        
+        <조건부>
+        1) IF 조건식 THEN 실행내용 END IF;  (단일 IF문)  
+*/
+
+-- 사번을 입력받아 사번, 이름, 급여, 보너스(%) 출력
+--  단, 보너스를 받지 않는 사원은 '보너스를 지급받지 않는 사원입니다'출력
+
+DECLARE
+    EID EMPLOYEE.EMP_ID%TYPE;
+    ENAME EMPLOYEE.EMP_NAME%TYPE;
+    SALARY EMPLOYEE.SALARY%TYPE;
+    BONUS EMPLOYEE.BONUS%TYPE;
+BEGIN
+    SELECT EMP_ID, EMP_NAME, SALARY, NVL(BONUS, 0)
+       INTO EID, ENAME, SALARY, BONUS
+     FROM EMPLOYEE
+    WHERE EMP_ID = &사번;
+    
+    DBMS_OUTPUT.PUT_LINE('사번 : ' || EID);
+    DBMS_OUTPUT.PUT_LINE('사원명 : ' || ENAME);
+    DBMS_OUTPUT.PUT_LINE('급여 : ' || SALARY);
+    
+    IF BONUS = 0
+        THEN DBMS_OUTPUT.PUT_LINE('보너스를 받지 않는 사원입니다');
+    END IF;
+    
+    DBMS_OUTPUT.PUT_LINE('보너스 : ' || BONUS*100 || '%');
+END;
+/
+
+-- 2) IF 조건식 THEN 실행내용 ELSE 실행내용 END IF;  (IF-ELSE)
+DECLARE
+    EID EMPLOYEE.EMP_ID%TYPE;
+    ENAME EMPLOYEE.EMP_NAME%TYPE;
+    SALARY EMPLOYEE.SALARY%TYPE;
+    BONUS EMPLOYEE.BONUS%TYPE;
+BEGIN
+    SELECT EMP_ID, EMP_NAME, SALARY, NVL(BONUS, 0)
+       INTO EID, ENAME, SALARY, BONUS
+     FROM EMPLOYEE
+    WHERE EMP_ID = &사번;
+    
+    DBMS_OUTPUT.PUT_LINE('사번 : ' || EID);
+    DBMS_OUTPUT.PUT_LINE('사원명 : ' || ENAME);
+    DBMS_OUTPUT.PUT_LINE('급여 : ' || SALARY);
+    
+    IF BONUS = 0
+        THEN DBMS_OUTPUT.PUT_LINE('보너스를 받지 않는 사원입니다');
+    ELSE
+        DBMS_OUTPUT.PUT_LINE('보너스 : ' || BONUS*100 || '%');
+    END IF;
+
+END;
+/
+
+------------------------------------------ 실습문제 ---------------------------------------------
+/*
+    레퍼런스변수 : EID, ENAME, DTITLE, NCODE
+          참조컬럼 : EMP_ID, EMP_NAME, DEPT_TITLE, NATIONAL_CODE
+          
+    일반변수 : TEAM(소속)  
+    
+    실행 : 사용자가 입력한 사번의 사번, 이름, 부서명, 근무국가코드를 변수에 대입
+             단) NCODE값이 KO일 경우   => TEAM변수에 '국내팀'
+                  NCODE값이 KO가 아닐 경우   => TEAM변수에 '해외팀'
+                  
+             출력 : 사번, 이름, 부서명, 소속     
+*/
+
+
+
+
+
 
 
