@@ -183,7 +183,9 @@ BEGIN
 END;
 /
 
+----------------------------------------------------------------------------------------------
 -- 2) IF 조건식 THEN 실행내용 ELSE 실행내용 END IF;  (IF-ELSE)
+
 DECLARE
     EID EMPLOYEE.EMP_ID%TYPE;
     ENAME EMPLOYEE.EMP_NAME%TYPE;
@@ -221,10 +223,115 @@ END;
                   
              출력 : 사번, 이름, 부서명, 소속     
 */
+DECLARE
+    EID EMPLOYEE.EMP_ID%TYPE; 
+    ENAME EMPLOYEE.EMP_NAME%TYPE; 
+    DTITLE DEPARTMENT.DEPT_TITLE%TYPE;
+    NCODE LOCATION.NATIONAL_CODE%TYPE;
+    
+    TEAM VARCHAR2(10);
+    
+BEGIN
+    SELECT EMP_ID, EMP_NAME, DEPT_TITLE, NATIONAL_CODE
+       INTO EID, ENAME, DTITLE, NCODE
+     FROM EMPLOYEE
+      JOIN DEPARTMENT ON (DEPT_CODE = DEPT_ID)
+      JOIN LOCATION ON (LOCATION_ID = LOCAL_CODE)
+    WHERE EMP_ID = &사번;
+    
+    IF NCODE = 'KO'
+        THEN TEAM := '국내팀';
+    ELSE
+        TEAM := '해외팀';
+    END IF;    
+
+    DBMS_OUTPUT.PUT_LINE('사번 : ' || EID);
+    DBMS_OUTPUT.PUT_LINE('사원명 : ' || ENAME);
+    DBMS_OUTPUT.PUT_LINE('부서명 : ' || DTITLE);
+    DBMS_OUTPUT.PUT_LINE('소속 : ' || TEAM);
+END;
+/
+
+----------------------------------------------------------------------------------------------
+/*
+    3) IF-ELSE IF 조건문
+    IF 조건식1
+         THEN 실행내용1
+    ELSIF 조건식2
+         THEN 실행내용2
+    ELSIF 조건식3
+         THEN 실행내용3
+    ELSE
+         실행내용4
+    END IF;     
+*/
+
+-- 사용자로부터 점수를 입력받아 학점 출력
+DECLARE
+    SCORE NUMBER;
+    GRADE CHAR(1);
+BEGIN
+    SCORE := &점수;
+    
+    IF SCORE >= 90 THEN GRADE := 'A';
+    ELSIF SCORE >= 80 THEN GRADE := 'B';
+    ELSIF SCORE >= 70 THEN GRADE := 'C';
+    ELSIF SCORE >= 60 THEN GRADE := 'D';
+    ELSE GRADE := 'F';
+    END IF;
+    
+    DBMS_OUTPUT.PUT_LINE('당신의 점수는 ' || SCORE || '점 이고, 학점은 ' || GRADE || '입니다');
+END;
+/
+    
+------------------------------------------ 실습문제 ---------------------------------------------
+/*
+    사용자로 부터 사번을 입력받아 사원의 급여를 조회하여 SAL변수에 저장
+    500만원 이상이면 '고급'
+    499 ~ 300만원 이면 '중급'
+    나머지는 '초급'
+*/
 
 
 
 
 
+----------------------------------------------------------------------------------------------
+/*
+    4) CASE 문(SWITH CASE문과 동일)
+    
+    CASE 비교대상자
+        WHEN 비교할값1 THEN 실행내용1
+        WHEN 비교할값2 THEN 실행내용2
+        WHEN 비교할값3 THEN 실행내용3
+        ELSE 실행내용4
+    END;    
+*/
 
+-- 사용자로부터 사번을 입력받아 DEPT_CODE를 조회
+-- DEPT_CODE가 D1이면 인사관리부 .....
 
+DECLARE
+    EID EMPLOYEE.EMP_ID%TYPE;
+    ENAME EMPLOYEE.EMP_NAME%TYPE;
+    DCODE EMPLOYEE.DEPT_CODE%TYPE;
+    DNAME VARCHAR2(30);
+BEGIN
+    SELECT EMP_ID, EMP_NAME ,DEPT_CODE
+       INTO EID, ENAME, DCODE
+      FROM EMPLOYEE
+    WHERE EMP_ID = &사번;
+    
+   DNAME := CASE DCODE
+                        WHEN 'D1' THEN '인사관리부'
+                        WHEN 'D2' THEN '회계관리부'
+                        WHEN 'D3' THEN  '마케팅부'
+                        WHEN 'D4' THEN '국내영업부'
+                        WHEN 'D8' THEN '기술지원부'
+                        WHEN 'D9' THEN '총무부'
+                        ELSE '해외영업부'
+                     END;
+                     
+    DBMS_OUTPUT.PUT_LINE(ENAME || '는 ' || DNAME || '입니다');
+END;
+/
