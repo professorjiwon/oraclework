@@ -1,0 +1,35 @@
+1. 서비스
+oracle 관련 실행 중지
+
+2. 제어판에서
+oracle 삭제
+
+3. 레지스트리 편집기 
+   oracle관련 모두 삭제
+HKEY_LOCAL_MACHINE\SOFTWARE\ORACLE
+HKEY_LOCAL_MACHINE\SOFTWARE\ODBC
+HKEY_LOCAL_MACHINE\SYSTEM\ControlSet001\Services\  
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\EventLog\Application\ 
+
+4. 환경변수 path 부분 삭제
+
+5. C:\Program Files에서 Oracle 폴더 삭제
+
+6. 컴터 재부팅
+
+7. C:\app에 있는 설치한 오라클 폴더 삭제
+
+- 재설치 안될 때
+
+1. cmd.exe(관리자 권한으로)를 실행
+
+  net user administrator /active:yes
+
+2 관리자 계정으로 들어가 오라클 설치
+
+3 다시 일반계정 로그인 후
+
+4 cmd.exe(관리자 권한으로)를 실행
+
+  net user administrator /active:no
+
