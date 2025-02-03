@@ -194,10 +194,151 @@ WHERE ENT_YN = 'N';
 --------------------------------- 실습문제 ---------------------------------
 -- EMPLOYEE테이블에서
 --1. 급여가 300만원 이상인 사원들의 사원명, 급여, 입사일, 연봉 조회
+SELECT EMP_NAME, SALARY, HIRE_DATE, SALARY*12 연봉
+FROM EMPLOYEE
+WHERE SALARY >= 3000000;
 
 --2. 연봉이 5000만원 이상인 사원들의 사원명, 급여, 연봉, 부서코드 조회
+SELECT EMP_NAME, SALARY, SALARY*12 연봉, DEPT_CODE
+FROM EMPLOYEE
+WHERE SALARY*12 >= 50000000;
 
 --3. 직급코드가 'J3'이 아닌 사원들의 사번, 사원명, 직급코드, 퇴사여부 조회
+SELECT EMP_ID, EMP_NAME, JOB_CODE, ENT_YN
+FROM EMPLOYEE
+WHERE JOB_CODE != 'J3';
+
+---------------------------------------------------------------------------------------------
+/*
+    <논리 연산자>
+    여러개의 조건을 묶어서 제시하고자 할 때
+    
+    AND (~이면서, 그리고)
+    OR (~이거나, 또는)
+*/
+
+-- EMPLOYEE테이블에서 부서코드가 'D9'이면서 급여가 500만원 이상인 사원들의 사원명, 부서코드, 급여 조회
+SELECT EMP_NAME, DEPT_CODE,  SALARY
+FROM EMPLOYEE
+WHERE DEPT_CODE = 'D9' AND SALARY >= 5000000;
+
+-- EMPLOYEE테이블에서 부서코드가 'D6'이거나 급여가 300만원 이상인 사원들의 사원명, 부서코드, 급여 조회
+SELECT EMP_NAME, DEPT_CODE, SALARY
+FROM EMPLOYEE
+WHERE DEPT_CODE = 'D6' OR SALARY >= 3000000;
+
+-- EMPLOYEE테이블에서  급여가 350만원 이상 600만원 이하인 사원들의 사번, 사원명, 급여 조회
+SELECT EMP_ID, EMP_NAME, SALARY
+FROM EMPLOYEE
+WHERE SALARY >= 3500000 AND SALARY <= 6000000;
+-- WHERE 3500000 <= SALARY <= 6000000;  오류
+
+---------------------------------------------------------------------------------------------
+/*
+    <BETWEEN AND>
+    조건식에서 사용되는 구문
+    ~ 이상 ~이하인 범위에 대한 조건 제시에 사용되는 연산자
+    
+    [표현법]
+    비교대상컬럼 BETWEEN 하한값 AND 상한값
+    -> 해당 컬럼값이 하한값 이상이고 상한값 이하인 데이터
+*/
+
+-- EMPLOYEE테이블에서  급여가 350만원 이상 600만원 이하인 사원들의 사번, 사원명, 급여 조회
+SELECT EMP_ID, EMP_NAME, SALARY
+FROM EMPLOYEE
+WHERE SALARY BETWEEN 3500000 AND 6000000;
+
+-- EMPLOYEE테이블에서  급여가 350만원 미만 600만원 초과인 사원들의 사번, 사원명, 급여 조회
+SELECT EMP_ID, EMP_NAME, SALARY
+FROM EMPLOYEE
+-- WHERE SALARY < 3500000 OR SALARY > 6000000;
+WHERE NOT SALARY BETWEEN 3500000 AND 6000000;
+-- NOT : 논리부정 연산자
+-- 컬럼명 앞 또는 BETWEEN앞에 기입
+
+-- EMPLOYEE테이블에서 입사일이 '90/01/01 ~ 99/12/31' 인 사원들의 사번, 사원명, 입사일 조회
+SELECT EMP_ID, EMP_NAME, HIRE_DATE
+FROM EMPLOYEE
+-- WHERE HIRE_DATE >= '90/01/01' AND HIRE_DATE <= '99/12/31';
+WHERE HIRE_DATE BETWEEN '90/01/01' AND '99/12/31';
+
+---------------------------------------------------------------------------------------------
+/*
+    <LIKE>
+    비교하고자하는 컬럼값이 내가 제시한 특정패턴에 만족하는 경우 조회
+    
+    [표현법]
+    비교대상컬럼 LIKE '특정패턴'
+     -> 특정패턴 : '%', '_' 와일드카드로 사용할 수 있음
+     
+     >> '%' : 0글자 이상
+       ex) 비교대상컬럼 LIKE '문자%' => 비교대상 컬럼값이 '문자'로 시작하는 데이터 조회
+            비교대상컬럼 LIKE '%문자' => 비교대상 컬럼값이 '문자'로 끝나는 데이터 조회
+            비교대상컬럼 LIKE '%문자%' => 비교대상 컬럼값이 '문자'가 포함된 데이터 조회
+            
+    >> '_' : 1글자
+       ex) 비교대상컬럼 LIKE '_문자' => 비교대상 컬럼값이 '문자'앞에 무조건 한글자가 있는 데이터 조회
+            비교대상컬럼 LIKE '__문자' => 비교대상 컬럼값이 '문자'앞에 무조건 두글자가 있는 데이터 조회
+            비교대상컬럼 LIKE '_문자_' => 비교대상 컬럼값이 '문자'앞에 무조건 한글자, 뒤에도 무조건 한글자가 있는 데이터 조회
+       
+*/
+
+-- EMPLOYEE테이블에서 사원들 성이 전씨인 사원들의 사원명, 급여, 입사일 조회
+SELECT EMP_NAME, SALARY, HIRE_DATE
+FROM EMPLOYEE
+WHERE EMP_NAME LIKE '전%';
+
+-- EMPLOYEE테이블에서 사원들 이름에 '하'가 포함되어 있는 사원들의 사원명, 주민번호, 전화번호 조회
+SELECT EMP_NAME, EMP_NO, PHONE
+FROM EMPLOYEE
+WHERE EMP_NAME LIKE '%하%';
+
+-- EMPLOYEE테이블에서 사원들 이름에 '하'가 중간에 들어있는 사원들의 사원명, 전화번호 조회
+SELECT EMP_NAME, PHONE
+FROM EMPLOYEE
+WHERE EMP_NAME LIKE '_하_';
+
+-- EMPLOYEE테이블에서 전화번호의 3번째 자리가 '1'인 사원의  사번, 사원명, 전화번호 조회
+SELECT EMP_ID, EMP_NAME, PHONE
+FROM EMPLOYEE
+WHERE PHONE LIKE '__1%';
+
+-- EMPLOYEE테이블에서 이메일에 _앞에 글자가 3글자인 사원의 사원명, 이메일 조회
+SELECT EMP_NAME, EMAIL
+FROM EMPLOYEE
+WHERE EMAIL LIKE '____%';  -- 언더바 4개로 인식 글자가 4글자 이상을 가져옴. 원했던 결과가 아님
+/*
+    * '_'가 와일드카드 인지 데이터값인지 구분지어야 함
+      -> 데이터값으로 취급하고자하는 값 앞에 나만의 와일드카드(아무거나 가능)를 제시하고 ESCAPE에 등록한다.
+          *  특수기호 중 '&'를 쓰면 오라클에서는 사용자로부터 입력받는 키워드이므로 안쓰는 것이 좋다
+*/
+
+SELECT EMP_NAME, EMAIL
+FROM EMPLOYEE
+WHERE EMAIL LIKE '___$_%' ESCAPE '$';
+
+-- 위 예제의 사원들을 제외한 다른 사원들 조회
+SELECT EMP_NAME, EMAIL
+FROM EMPLOYEE
+WHERE NOT EMAIL LIKE '___w_%' ESCAPE 'w';
+
+--------------------------------- 실습문제 ---------------------------------
+--1. EMPLOYEE에서 이름이 '연'으로 끝나는 사원들의 사원명, 입사일 조회
+
+
+--2. EMPLOYEE에서 전화번호 처음 3자리가 010이 아닌 사원들의 사원명, 전화번호 조회
+
+
+--3. EMPLOYEE에서 이름에 '하'가 포함되어 있고 급여가 240만원 이상인 사원들의 사원명, 급여 조회
+
+
+--4. DEPARTMENT에서 해외영업부인 부서들의 부서코드, 부서명 조회
+
+
+
+
+
 
 
 
