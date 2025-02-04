@@ -85,12 +85,12 @@ FROM EMPLOYEE;
     <리터럴>
     임의로 지정한 문자열을 컬럼처럼 넣을 수 있음
     
-    SELECT절에 리터럴을 넣으면 마치 테이블사에 존재하는 데이터처럼 조회 가능
+    SELECT절에 리터럴을 넣으면 마치 테이블상에 존재하는 데이터처럼 조회 가능
     조회된 RESULT SET의 모든 행에 반복적으로 같이 출력
 */
 
 -- EMPLOYEE 테이블에서 사번, 사원명, 급여, 원 조회
-SELECT EMP_ID, EMP_NAME, SALARY, '원' AS 단위
+SELECT EMP_ID, EMP_NAME, SALARY, '원' 단위
 FROM EMPLOYEE;
 
 -- EMPLOYEE 테이블에서 사번, 사원명, 급여, 원, 보너스, % 조회
@@ -213,8 +213,8 @@ WHERE JOB_CODE != 'J3';
     <논리 연산자>
     여러개의 조건을 묶어서 제시하고자 할 때
     
-    AND (~이면서, 그리고)
-    OR (~이거나, 또는)
+    AND (~이면서, 그리고)  
+    OR (~이거나, 또는)     
 */
 
 -- EMPLOYEE테이블에서 부서코드가 'D9'이면서 급여가 500만원 이상인 사원들의 사원명, 부서코드, 급여 조회
@@ -353,7 +353,7 @@ WHERE DEPT_TITLE LIKE '해외영업%';
 -- EMPLOYEE테이블에서 보너스를 받지 않는 사원들의 사번, 사원명, 급여, 보너스 조회
 SELECT EMP_ID, EMP_NAME, SALARY, BONUS
 FROM EMPLOYEE
--- WHERE BONUS = NULL;    조회 안됨
+-- WHERE BONUS = NULL;    --조회 안됨
 WHERE BONUS IS NULL;
 
 -- EMPLOYEE테이블에서 보너스를 받는 사원들의 사번, 사원명, 급여, 보너스 조회
@@ -453,24 +453,31 @@ ORDER BY 2 DESC;            -- 2번째 컬럼
 
 --------------------------------- 실습문제 ---------------------------------
 --1. 사수가 없고 부서배치도 받지 않은 사원들의 사원명, 사수사번, 부서코드 조회
+SELECT EMP_NAME, MANAGER_ID, DEPT_CODE
+FROM EMPLOYEE
+WHERE MANAGER_ID IS NULL AND DEPT_CODE IS NULL;
 
 --2. 연봉(보너스포함X)이 3000만원 이상이고 보너스를 받지 않은 사원들의 사번, 사원명, 연봉, 보너스 조회
+SELECT EMP_ID, EMP_NAME, SALARY*12 연봉, BONUS
+FROM EMPLOYEE
+WHERE SALARY*12 >= 30000000 AND BONUS IS NULL;
 
 --3. 입사일이 95/01/01이상이고 부서배치를 받은 사원들의 사번, 사원명, 입사일, 부서코드 조회
+SELECT EMP_ID, EMP_NAME, HIRE_DATE, DEPT_CODE
+FROM EMPLOYEE
+WHERE HIRE_DATE >= '95/01/01' AND DEPT_CODE IS NOT NULL;
 
 --4. 급여가 200만원 이상 500만원 이하고 입사일이 01/01/01이상이고 보너스를 받지 않는 사원들의 
 --   사번, 사원명, 급여, 입사일, 보너스 조회
+SELECT EMP_ID, EMP_NAME, SALARY, HIRE_DATE, BONUS
+FROM EMPLOYEE
+WHERE SALARY BETWEEN 2000000 AND 5000000 
+    AND HIRE_DATE >= '01/01/01' 
+    AND BONUS IS NULL;
 
 --5. 보너스포함 연봉이 NULL이 아니고 이름에 '하'가 포함되어 있는 사원들의 
 --   사번, 사원명, 급여, 보너스포함연봉 조회 (별칭부여)
-
-
-
-
-
-
-
-
-
-
-
+SELECT EMP_ID, EMP_NAME, SALARY, (SALARY*  BONUS + SALARY )*12 총소득
+FROM EMPLOYEE
+WHERE SALARY*(1+BONUS)*12 IS NOT NULL
+    AND EMP_NAME LIKE '%하%';
