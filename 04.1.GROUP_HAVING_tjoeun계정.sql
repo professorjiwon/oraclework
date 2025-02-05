@@ -68,8 +68,108 @@ HAVING AVG(SALARY) >= 3000000;
 
 ---------------------------- 실습문제------------------------------
 --1. 직급별 총 급여합(단, 직급별 급여합이 1000만원 이상인 직급만 조회) 직급코드, 급여합 조회
+SELECT JOB_CODE, SUM(SALARY)
+FROM EMPLOYEE
+GROUP BY JOB_CODE
+HAVING SUM(SALARY) >= 10000000;
 
 --2. 부서별 보너스를 받는 사원이 없는 부서만 부서코드를 조회
+SELECT DEPT_CODE
+FROM EMPLOYEE
+GROUP BY DEPT_CODE
+HAVING COUNT(BONUS) = 0;
 
+SELECT DEPT_CODE, COUNT(BONUS)
+FROM EMPLOYEE
+GROUP BY DEPT_CODE;
+
+/*
+    <SELECT문 실행 순서>
+    FROM
+    ON : 조인 조건 확인
+    JOIN : 테이블간의 조인
+    WHERE
+    GROUP BY
+    HAVING
+    SELECT
+    DISTINCT
+    ORDER BY
+*/
+
+---------------------------------------------------------------------------------------------------------
+/*
+    <집계함수>
+    그룹별로 산출된 결과 값에 중간집계를 계산해 주는 함수
+    
+    ROLLUP, CUBE
+    => GROUP BY 절에 기술하는 함수
+    
+    - ROLLUP(컬럼1, 컬럼2) : 컬럼1을 가지고 다시 중간집계를 내는 함수
+    - CUBE(컬럼1, 컬럼2) : 컬럼1을 가지고 중간집계를 내고, 컬럼2도 중간집계를 냄
+*/
+-- 각 직급별 급여의 합
+SELECT JOB_CODE, SUM(SALARY)
+FROM EMPLOYEE
+GROUP BY JOB_CODE
+ORDER BY  JOB_CODE;
+
+-- 컬럼이 1개 일때는 CUBE, ROLLUP, 안쓴것 모두 동일
+SELECT JOB_CODE, SUM(SALARY)
+FROM EMPLOYEE
+GROUP BY CUBE(JOB_CODE)
+ORDER BY  JOB_CODE;
+
+-- 컬럼이 2개 일때 사용
+SELECT JOB_CODE, DEPT_CODE, SUM(SALARY)
+FROM EMPLOYEE
+GROUP BY JOB_CODE, DEPT_CODE
+ORDER BY JOB_CODE, DEPT_CODE;
+
+-- ROLLUP
+SELECT JOB_CODE, DEPT_CODE, SUM(SALARY)
+FROM EMPLOYEE
+GROUP BY ROLLUP(JOB_CODE, DEPT_CODE)
+ORDER BY JOB_CODE, DEPT_CODE;
+
+-- CUBE
+SELECT JOB_CODE, DEPT_CODE, SUM(SALARY)
+FROM EMPLOYEE
+GROUP BY CUBE(JOB_CODE, DEPT_CODE)
+ORDER BY JOB_CODE, DEPT_CODE;
+
+---------------------------------------------------------------------------------------------------------
+/*
+    <집합 연산자>
+    여러개의 쿼리문을 가지고 하나의 쿼리문으로 만드는 연산자
+    
+    - UNION : OR | 합집합
+    - INTERSECT : AND | 교집합
+    - UNION ALL : 합집합 + 교집합
+    - MINUS : 차집합
+*/
+
+-----------------------------------------------1. UNION ----------------------------------------
+-- 부서코드가 D5인 사원 또는 급여 300만원 초과인 사원들 조회
+SELECT EMP_NAME, DEPT_CODE, SALARY
+FROM EMPLOYEE
+WHERE DEPT_CODE = 'D5';
+
+SELECT EMP_NAME, DEPT_CODE, SALARY
+FROM EMPLOYEE
+WHERE SALARY > 3000000;
+
+-- UNION
+SELECT EMP_NAME, DEPT_CODE, SALARY
+FROM EMPLOYEE
+WHERE DEPT_CODE = 'D5'
+UNION
+SELECT EMP_NAME, DEPT_CODE, SALARY
+FROM EMPLOYEE
+WHERE SALARY > 3000000;
+
+-- OR
+SELECT EMP_NAME, DEPT_CODE, SALARY
+FROM EMPLOYEE
+WHERE DEPT_CODE = 'D5' OR SALARY > 3000000;
 
 
