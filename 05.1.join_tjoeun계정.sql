@@ -101,5 +101,33 @@ SELECT EMP_ID, EMP_NAME, JOB_CODE, JOB_NAME
 FROM EMPLOYEE
 JOIN JOB USING(JOB_CODE);
 
+-- [참고]
+-- NATURAL JOIN : 공통된 컬럼을 자동으로 매칭시켜줌
+SELECT EMP_ID, EMP_NAME, JOB_CODE, JOB_NAME
+FROM EMPLOYEE
+NATURAL JOIN JOB;
 
+-- 3) 추가적인 조건도 제시 가능
+-- 직급이 대리인 사원의 사번, 사원명, 직급명, 급여 조회
+-- >> 오라클 전용 구문
+SELECT EMP_ID, EMP_NAME, JOB_NAME, SALARY
+FROM EMPLOYEE E, JOB J
+WHERE E.JOB_CODE = J.JOB_CODE
+    AND JOB_NAME = '대리';
+
+-- >> ANSI 구문
+SELECT EMP_ID, EMP_NAME, JOB_NAME, SALARY
+FROM EMPLOYEE
+JOIN JOB USING(JOB_CODE)
+WHERE JOB_NAME = '대리';
+
+------------------------------------------  실습 문제  -------------------------------------------
+-- 모든 문제는 오라클 전용 구문과 ANSI 구문 2가지 모두 다 하기
+-- 1. 부서가 인사관리부인 사원들의 사번, 이름,  부서명, 보너스 조회
+
+-- 2. DEPARTMENT과 LOCATION을 참고하여 전체 부서의 부서코드, 부서명, 지역코드, 지역명 조회
+
+-- 3. 보너스를 받는 사원들의 사번, 사원명, 보너스, 부서명 조회
+
+-- 4. 부서가 총무부가 아닌 사원들의 사원명, 급여, 부서명 조회
 
