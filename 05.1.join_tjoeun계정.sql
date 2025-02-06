@@ -271,7 +271,6 @@ LEFT JOIN EMPLOYEE M ON (E.MANAGER_ID = M.EMP_ID);
     DEPARTMENT    DEPT_ID  
     JOB                                         JOB_CODE
 */
-
 -->> 오라클 전용 구문
 SELECT EMP_ID, EMP_NAME, DEPT_TITLE, JOB_NAME
 FROM EMPLOYEE E, DEPARTMENT, JOB J
@@ -317,12 +316,49 @@ JOIN LOCATION ON (LOCATION_ID = LOCAL_CODE);
 
 ------------------------------------------  실습 문제  -------------------------------------------
 -- 1. 사번, 사원명, 부서명, 지역명, 국가명 조회(EMPLOYEE, DEPARTMENT, LOCATION, NATIONAL 조인)
+/*
+    EMPLOYEE          DEPT_CODE
+    DEPARTMENT      DEPT_ID         LOCATION_ID
+    LOCATION                               LOCAL_CODE      NATIONAL_CODE
+    NATIONAL                                                        NATIONAL_CODE
+*/
 -- >> 오라클 구문
+SELECT EMP_ID, EMP_NAME, DEPT_TITLE, LOCAL_NAME, NATIONAL_NAME
+FROM EMPLOYEE, DEPARTMENT, LOCATION L, NATIONAL N
+WHERE DEPT_CODE = DEPT_ID
+   AND LOCATION_ID = LOCAL_CODE
+   AND L.NATIONAL_CODE = N.NATIONAL_CODE;
 
 --  >> ANSI구문
+SELECT EMP_ID, EMP_NAME, DEPT_TITLE, LOCAL_NAME, NATIONAL_NAME
+FROM EMPLOYEE
+JOIN DEPARTMENT ON (DEPT_CODE = DEPT_ID)
+JOIN LOCATION ON (LOCATION_ID = LOCAL_CODE)
+JOIN NATIONAL USING (NATIONAL_CODE);
 
 -- 2. 사번, 사원명, 부서명, 직급명, 지역명, 국가명, 급여등급 조회 (모든 테이블 다 조인)
+/*
+    EMPLOYEE          DEPT_CODE                             JOB_CODE                SALARY
+    DEPARTMENT      DEPT_ID         LOCATION_ID
+    JOB                                                                 JOB_CODE
+    LOCATION                               LOCAL_CODE      NATIONAL_CODE
+    NATIONAL                                                        NATIONAL_CODE
+    SAL_GRADE                                                                                   MIN_SAL, MAX_SAL
+*/
 -- >> 오라클 구문
-
+SELECT EMP_ID, EMP_NAME, DEPT_TITLE, JOB_NAME, LOCAL_NAME, NATIONAL_NAME, SAL_LEVEL
+FROM EMPLOYEE E, DEPARTMENT D, JOB J, LOCATION L, NATIONAL N, SAL_GRADE
+WHERE DEPT_CODE = DEPT_ID
+   AND E.JOB_CODE = J.JOB_CODE
+   AND LOCATION_ID = LOCAL_CODE
+   AND L.NATIONAL_CODE = N.NATIONAL_CODE
+   AND SALARY BETWEEN MIN_SAL AND MAX_SAL;
+   
 --  >> ANSI구문
-
+SELECT EMP_ID, EMP_NAME, DEPT_TITLE, JOB_NAME, LOCAL_NAME, NATIONAL_NAME, SAL_LEVEL
+FROM EMPLOYEE
+JOIN DEPARTMENT ON (DEPT_CODE = DEPT_ID)
+JOIN JOB USING(JOB_CODE)
+JOIN LOCATION ON (LOCATION_ID = LOCAL_CODE)
+JOIN NATIONAL USING (NATIONAL_CODE)
+JOIN SAL_GRADE ON(SALARY BETWEEN MIN_SAL AND MAX_SAL);
