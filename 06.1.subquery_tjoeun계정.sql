@@ -256,3 +256,10 @@ FROM EMPLOYEE
 WHERE (DEPT_CODE, JOB_CODE) = (SELECT DEPT_CODE, JOB_CODE
                                                   FROM EMPLOYEE
                                                   WHERE EMP_NAME = '구정하');
+                                                  
+-- 하정연 사원의 직급코드와 사수가 같은 사원의 사번, 사원명, 직급코드,사수ID 조회   
+
+
+
+
+
