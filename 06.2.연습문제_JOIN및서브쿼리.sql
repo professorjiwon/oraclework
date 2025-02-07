@@ -112,15 +112,54 @@ FROM EMPLOYEE
 GROUP BY ENT_YN;
 
 -- 11. 보너스 포함한 연봉이 높은 5명의 사번, 사원명, 부서명, 직급명, 입사일, 순위 조회
-
+SELECT EMP_ID, EMP_NAME, DEPT_TITLE, JOB_NAME, HIRE_DATE, 연봉, 순위
+FROM ( SELECT EMP_ID, EMP_NAME, DEPT_TITLE, JOB_NAME, HIRE_DATE, 
+                        SALARY * NVL(1+BONUS, 1) *12 연봉,
+                        RANK() OVER(ORDER BY (SALARY * NVL(1+BONUS, 1) *12) DESC) 순위
+            FROM EMPLOYEE
+            JOIN DEPARTMENT ON (DEPT_CODE = DEPT_ID)
+            JOIN JOB USING(JOB_CODE)
+          )
+WHERE 순위 <= 5;
 
 -- 12. 부서 별 급여 합계가 전체 급여 총 합의 20%보다 많은 부서의 부서명, 부서별 급여 합계 조회
 --	   12-1. JOIN과 HAVING 사용  
-
+SELECT DEPT_TITLE, SUM(SALARY)
+FROM EMPLOYEE
+JOIN DEPARTMENT ON (DEPT_CODE = DEPT_ID)
+GROUP BY DEPT_TITLE
+HAVING SUM(SALARY) > (SELECT SUM(SALARY) * 0.2
+                                      FROM EMPLOYEE);
+                                      
 --	   12-2. 인라인 뷰 사용 
+SELECT *
+FROM (SELECT DEPT_TITLE, SUM(SALARY) 급여합
+            FROM EMPLOYEE
+            JOIN DEPARTMENT ON (DEPT_CODE = DEPT_ID)
+            GROUP BY DEPT_TITLE)
+WHERE 급여합 > (SELECT SUM(SALARY) * 0.2
+                                      FROM EMPLOYEE);
 
 --	   12-3. WITH 사용
+WITH SSUM AS (SELECT DEPT_TITLE, SUM(SALARY) 급여합
+                        FROM EMPLOYEE
+                        JOIN DEPARTMENT ON (DEPT_CODE = DEPT_ID)
+                        GROUP BY DEPT_TITLE)
 
+SELECT *
+FROM SSUM
+WHERE 급여합 > (SELECT SUM(SALARY) * 0.2
+                                      FROM EMPLOYEE);
+                                      
 -- 13. 부서명별 급여 합계 조회(NULL도 조회되도록)
+SELECT DEPT_TITLE, SUM(SALARY)
+FROM EMPLOYEE
+LEFT JOIN DEPARTMENT ON (DEPT_CODE = DEPT_ID)
+GROUP BY DEPT_TITLE;
 
 -- 14. WITH를 이용하여 급여합과 급여평균 조회
+WITH SSUM AS (SELECT SUM(SALARY) FROM EMPLOYEE),
+         SAVG AS (SELECT CEIL(AVG(SALARY)) FROM EMPLOYEE)
+
+SELECT *
+FROM SSUM, SAVG;
