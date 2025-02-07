@@ -245,7 +245,8 @@ JOIN SAL_GRADE ON (SALARY BETWEEN MIN_SAL AND MAX_SAL);
 --                                    사수사번, 사수명, 사수부서코드  (EMPLOYEE M 조회)
 -->> 오라클 전용 구문
 -- 사수가 있는 사원만 조회
-SELECT E.EMP_ID, E.EMP_NAME, E.DEPT_CODE, M.EMP_ID, M.EMP_NAME, M.DEPT_CODE
+SELECT E.EMP_ID, E.EMP_NAME, E.DEPT_CODE, 
+            M.EMP_ID, M.EMP_NAME, M.DEPT_CODE
 FROM EMPLOYEE E, EMPLOYEE M
 WHERE E.MANAGER_ID = M.EMP_ID;
 
