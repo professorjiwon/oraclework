@@ -343,3 +343,110 @@ INSERT INTO MEM VALUES(3, 'user03', 'pwd03', '김순이', '여', '010-1982-2929'
           - FOREIGN KEY(컬럼명) REFERENCES 참조할테이블명(참조할컬럼명)
             [CONSTRAINT 제약조건명] FOREIGN KEY(컬럼명) REFERENCES 참조할테이블명(참조할컬럼명)
 */
+
+CREATE TABLE MEM2(
+    MEM_NO NUMBER PRIMARY KEY,
+    MEM_ID VARCHAR2(20) NOT NULL UNIQUE,
+    MEM_PWD VARCHAR2(20) NOT NULL,
+    MEM_NAME VARCHAR2(20) NOT NULL,
+    GENDER CHAR(3) CHECK(GENDER IN ('남', '여')),
+    PHONE VARCHAR2(20),
+    EMAIL VARCHAR2(50),
+    GRADE_ID NUMBER REFERENCES MEM_GRADE(GRADE_CODE)
+);
+INSERT INTO MEM2 VALUES(1, 'user01', 'pwd01', '홍길동', '남', '010-1234-5678', 'hong@naver.com', NULL);
+INSERT INTO MEM2 VALUES(2, 'user02', 'pwd02', '나순이', '여', '010-1982-2929', 'na@google.com', 10);
+INSERT INTO MEM2 VALUES(3, 'user03', 'pwd03', '김순이', '여', '010-1982-2929', 'na@google.com', 50);
+
+-- MEM_GRADE(부모테이블)  ,  MEM2(자식테이블) 
+--> 이때 부모테이블에서 데이터값을 삭제할 경우 문제발생
+--    데이터 삭제시 : DELETE FROM 테이블명 WHERE 조건;
+
+--> MEM_GRADE테이블에서 10번 등급 삭제
+DELETE FROM MEM_GRADE
+WHERE GRADE_CODE = 10;
+-- 자식 테이블에 10이라는 값을 사용하고 있기 때문에 삭제 안됨
+
+DELETE FROM MEM_GRADE
+WHERE GRADE_CODE = 30;
+-- 자식 테이블에 30이라는 값을 사용하고 있지 않기 때문에 삭제됨
+
+--> 자식 테이블이 값을 사용할 경우 부모테이블로 부터 무조건 삭제가 안되는 삭제제한 옵션이 걸려있음
+INSERT INTO MEM_GRADE VALUES(30, '특별회원');
+
+-- * 삭제 옵션 * --------------------------------------------------
+/*
+    자식테이블 생성시 외래키 제약조건 기술시 삭제옵션 지정가능
+    - ON DELETE RESTRICTED(기본값) : 삭제 불가. 자식이 값을 사용하면 부모테이블의 값 삭제 불가
+    - ON DELETE SET NULL : 부모 데이터 삭제시 해당 데이터를 쓰고 있는 자식데이터의 값을 NULL로 변경
+    - ON DELETE CASCADE : 부모 데이터 삭제시 해당 데이터를 쓰고 있는 자식데이터도 같이 삭제(행 전체삭제)
+*/
+
+DROP TABLE MEM;
+DROP TABLE MEM2;
+
+CREATE TABLE MEM(
+    MEM_NO NUMBER PRIMARY KEY,
+    MEM_ID VARCHAR2(20) NOT NULL UNIQUE,
+    MEM_PWD VARCHAR2(20) NOT NULL,
+    MEM_NAME VARCHAR2(20) NOT NULL,
+    GENDER CHAR(3) CHECK(GENDER IN ('남', '여')),
+    PHONE VARCHAR2(20),
+    EMAIL VARCHAR2(50),
+    GRADE_ID NUMBER REFERENCES MEM_GRADE ON DELETE SET NULL
+    -- 부모테이블의 PRIMARY KEY와 외래키제약조건을 걸때는 컬럼명 생략 가능.
+    --   (자동으로 부모테이블의 PRIMARY KEY와 외래키를 맺음)
+);
+
+INSERT INTO MEM VALUES(1, 'user01', 'pwd01', '홍길동', '남', '010-1234-5678', 'hong@naver.com', NULL);
+INSERT INTO MEM VALUES(2, 'user02', 'pwd02', '나순이', '여', '010-1982-2929', 'na@google.com', 10);
+INSERT INTO MEM VALUES(3, 'user03', 'pwd03', '김순이', '여', '010-1982-2929', 'na@google.com', 20);
+
+DELETE FROM MEM_GRADE
+WHERE GRADE_CODE = 10;
+-- 삭제됨. 자식테이블의 값은 NULL이됨
+
+INSERT INTO MEM_GRADE VALUES(10,'일반회원');
+
+DROP TABLE MEM;
+
+CREATE TABLE MEM(
+    MEM_NO NUMBER PRIMARY KEY,
+    MEM_ID VARCHAR2(20) NOT NULL UNIQUE,
+    MEM_PWD VARCHAR2(20) NOT NULL,
+    MEM_NAME VARCHAR2(20) NOT NULL,
+    GENDER CHAR(3) CHECK(GENDER IN ('남', '여')),
+    PHONE VARCHAR2(20),
+    EMAIL VARCHAR2(50),
+    GRADE_ID NUMBER REFERENCES MEM_GRADE ON DELETE CASCADE
+);
+INSERT INTO MEM VALUES(1, 'user01', 'pwd01', '홍길동', '남', '010-1234-5678', 'hong@naver.com', NULL);
+INSERT INTO MEM VALUES(2, 'user02', 'pwd02', '나순이', '여', '010-1982-2929', 'na@google.com', 10);
+INSERT INTO MEM VALUES(3, 'user03', 'pwd03', '김순이', '여', '010-1982-2929', 'na@google.com', 20);
+INSERT INTO MEM VALUES(4, 'user04', 'pwd04', '박순이', '여', '010-1982-2929', 'na@google.com', 10);
+
+DELETE FROM MEM_GRADE
+WHERE GRADE_CODE = 10;
+-- 삭제됨. 자식도 같이 삭제(행전체 삭제)
+
+---------------------------------------------------------------------------------------------------------
+/*
+     <DEFAULT 기본값>
+       : 제약조건은 아님
+       컬럼에 값을 넣지 않았을 때 기본값이 들어가도록 해줄 수 있음.
+       
+       컬럼명 자료형 DEFAULT 기본값 [제약조건]
+*/
+CREATE TABLE MEMBER2(
+    MEM_NO NUMBER PRIMARY KEY,
+    MEM_ID VARCHAR(20) NOT NULL UNIQUE,
+    MEM_NAME VARCHAR(30) NOT NULL,
+    HOBBY VARCHAR(50) DEFAULT '없음',
+    MEM_DATE DATE DEFAULT SYSDATE
+);
+
+
+
+
+
+
