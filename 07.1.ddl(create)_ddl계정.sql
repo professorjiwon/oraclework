@@ -442,11 +442,72 @@ CREATE TABLE MEMBER2(
     MEM_ID VARCHAR(20) NOT NULL UNIQUE,
     MEM_NAME VARCHAR(30) NOT NULL,
     HOBBY VARCHAR(50) DEFAULT '없음',
-    MEM_DATE DATE DEFAULT SYSDATE
+    MEM_DATE DATE DEFAULT SYSDATE,
+    AGE NUMBER
 );
 
+INSERT INTO MEMBER2 VALUES(1,'user01', '홍길동', '운동', '25/02/09', 25);
+INSERT INTO MEMBER2 VALUES(2,'user02', '김한글', null, null, NULL);
+INSERT INTO MEMBER2 VALUES(3, 'user03', '이고잉', default, default, null);
 
+INSERT INTO MEMBER2(MEM_NO, MEM_ID, MEM_NAME) VALUES(4, 'user04', '빛나리');
 
+--===========================================================
+--                      <tjoeun 계정으로 실행>
+/*
+    <SUBQUERY를 이용한 테이블 생성>
+    : 테이블을 복사하는 개념
+    - 테이블의 구조만 복사
+    - 테이블의 구조및 데이터 모두 복사
+    
+    [표현식]
+    CREATE TABLE 테이블명
+    AS 서버쿼리;
+*/
 
+-- EMPLOYEE테이블을 모두 복사
+CREATE TABLE EMPLOYEE_COPY
+AS SELECT *
+     FROM EMPLOYEE;
+     
+     -- 컬럼, 데이터 복사
+     -- 제약조건의 경우 NOT NULL만 복사됨
+     
+-- EMPLOYEE테이블을 구조만 복사
+CREATE TABLE EMPLOYEE_COPY2
+AS SELECT *
+     FROM EMPLOYEE
+     WHERE 1=0;
 
+-- EMPLOYEE테이블의 몇개의 컬럼과 연봉의 컬럼이 있는 테이블 생성
+CREATE TABLE EMPLOYEE_COPY3
+AS SELECT EMP_NO, EMP_ID, EMP_NAME, SALARY, SALARY*12
+      FROM EMPLOYEE;
+      -- 오류 : 산술, 함수식 이 들어간 컬럼은 반드시 별칭 부여
+      
+CREATE TABLE EMPLOYEE_COPY3
+AS SELECT EMP_NO, EMP_ID, EMP_NAME, SALARY, SALARY*12 연봉
+      FROM EMPLOYEE;
+      
+---------------------------------------------------------------------------------------------------------
+/*
+    * 테이블을 다 생성한 후에 제약조건 추가
+    ALTER TABLE 테이블명 변경할  ADD(MODIFY) 내용;
+    - PRIMARY KEY : ALTER TABLE 테이블명 ADD PRIMARY KEY(컬럼명);
+    - FOREIGN KEY : ALTER TABLE 테이블명 ADD FORIEGN KEY(컬럼명) REFERENCES 참조할테이블명[(참조할컬럼명)]
+    - UNIQUE : ALTER TABLE 테이블명 ADD UNIQUE(컬럼명)
+    - CHECK : ALTER TABLE 테이블명 ADD CHECK(컬럼에 대한 조건식)
+    - NOT NULL : ALTER TABLE 테이블명 MODIFY 컬럼명 NOT NULL
+*/
+-- EMPLOYEE_COPY 테이블에 PRIMARY KEY 추가
+ALTER TABLE EMPLOYEE_COPY ADD PRIMARY KEY(EMP_ID);
 
+-- EMPLOYEE_COPY 테이블에 DEPARTMENT 외래키 추가
+ALTER TABLE EMPLOYEE_COPY ADD FOREIGN KEY(DEPT_CODE) REFERENCES DEPARTMENT;
+
+-- COMMENT 넣기
+COMMENT ON COLUMN EMPLOYEE_COPY.EMP_ID IS '회원번호';
+COMMENT ON COLUMN EMPLOYEE_COPY.EMP_NAME IS '회원이름';
+
+-- DEFALUT MODIFY
+ALTER TABLE EMPLOYEE_COPY MODIFY ENT_YN DEFAULT 'N';
