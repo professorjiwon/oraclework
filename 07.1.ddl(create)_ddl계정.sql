@@ -16,7 +16,7 @@
                          모든 데이터들은 테이블을 통해 저장됨
     
     [표현식]
-    CREATE TABLE 테이블명 (
+    CREATE TABLE(객체명) 테이블명(객체이름) (
             컬럼명 자료형(크기),
             컬럼명 자료형(크기),
             컬럼명 자료형,
@@ -78,7 +78,7 @@ INSERT INTO MEMBER VALUES(3, 'user03', 'pwd03', '이고잉', NULL, NULL, NULL, N
     <제약 조건>
     - 원하는 데이터값(유효한 형식의 값)만 유지하기 위해 특정 컬럼에 설정하는 제약
     - 데이터 무결성 보장을 목적으로 한다.
-      : 데이터에 결합이 없는 상태, 즉 데이터가 정확하고 유효하게 유지된 상태
+      : 데이터에 결함이 없는 상태, 즉 데이터가 정확하고 유효하게 유지된 상태
       1) 개체 무결성 제약조건 : NOT NULL, UNIQUE, PRIMARY KEY 조건 위배
       2) 참조 무결성 제약조건 : FOREIGN KEY(외래키) 조건 위배
       
@@ -171,8 +171,8 @@ CREATE TABLE MEM_UNIQUE2 (
     GENDER CHAR(3),
     PHONE VARCHAR2(20),
     EMAIL VARCHAR2(50),
-    UNIQUE (MEM_NO),
-    UNIQUE (MEM_ID)
+    UNIQUE(MEM_NO),
+    UNIQUE(MEM_ID)
 );
 
 -- 테이블 레벨 방식
@@ -195,3 +195,151 @@ INSERT INTO MEM_UNIQUE3 VALUES(3, 'user03', 'pwd03', '이고잉', NULL, NULL, NU
 INSERT INTO MEM_UNIQUE3 VALUES(3, 'user03', 'pwd03', '박한빛', NULL, NULL, NULL);
 -- UNIQUE 제약 조건 위배
 
+INSERT INTO MEM_UNIQUE3 VALUES(4, 'user04', 'pwd04', '박아름', 'ㄱ', NULL, NULL);
+--> 성별이 유효한 값이 아니어도 입력됨
+
+---------------------------------------------------------------------------------------------------------
+/*
+    * CHECK(조건식) 제약조건
+      해당 컬럼값에 들어올 수 있는 값에 대한 조건을 제시
+      해당 조건에 맞는 데이터값만 입력하도록 함
+*/
+
+
+CREATE TABLE MEM_CHECK (
+    MEM_NO NUMBER NOT NULL,
+    MEM_ID VARCHAR2(20) NOT NULL,
+    MEM_PWD VARCHAR2(20) NOT NULL,
+    MEM_NAME VARCHAR2(20) NOT NULL,
+    GENDER CHAR(3), -- CHECK(GENDER IN ('남', '여')),   -- 컬럼 레벨 방식
+    PHONE VARCHAR2(20),
+    EMAIL VARCHAR2(50),
+    UNIQUE (MEM_NO),
+    CHECK(GENDER IN ('남', '여'))   -- 테이블 레벨 방식
+);
+
+INSERT INTO MEM_CHECK VALUES(1, 'user01', 'pwd01', '홍길동', '남', '010-1234-5678', 'hong@naver.com');
+INSERT INTO MEM_CHECK VALUES(2, 'user02', 'pwd02', '나순이', '영', '010-1982-2929', 'na@google.com');
+-- CHECK 제약조건 위배
+
+---------------------------------------------------------------------------------------------------------
+/*
+    * PRIMARY KEY(기본키) 제약조건
+      테이블에서 각 행들을 식별하기 위해 사용될 컬럼에 부여하는 제약조건(식별자 역할)
+      그 컬럼에 NOT NULL + UNIQUE 제약조건 ->  검색, 삭제, 수정 등에 기본키의 컬럼을 이용한
+      EX) 회원번호, 학번, 사원번호, 운송장 번호, 예약번호, 주문번호....
+      
+      ** 유의 사항 : 한테이블 당 오로지 한개만 설정 가능
+*/
+-- 컬럼 레벨 방식
+CREATE TABLE MEM_PRIMARY (
+    MEM_NO NUMBER PRIMARY KEY,
+    MEM_ID VARCHAR2(20) NOT NULL UNIQUE,
+    MEM_PWD VARCHAR2(20) NOT NULL,
+    MEM_NAME VARCHAR2(20) NOT NULL,
+    GENDER CHAR(3) CHECK(GENDER IN ('남', '여')),
+    PHONE VARCHAR2(20),
+    EMAIL VARCHAR2(50)
+);
+
+-- 테이블 레벨 방식
+CREATE TABLE MEM_PRIMARY2 (
+    MEM_NO NUMBER,
+    MEM_ID VARCHAR2(20) NOT NULL,
+    MEM_PWD VARCHAR2(20) NOT NULL,
+    MEM_NAME VARCHAR2(20) NOT NULL,
+    GENDER CHAR(3),
+    PHONE VARCHAR2(20),
+    EMAIL VARCHAR2(50),
+    PRIMARY KEY(MEM_NO),
+    UNIQUE(MEM_ID),
+    CHECK(GENDER IN ('남', '여'))
+);
+
+CREATE TABLE MEM_PRIMARY3 (
+    MEM_NO NUMBER PRIMARY KEY,
+    MEM_ID VARCHAR2(20) PRIMARY KEY  -- 오류 : PRIMARY KEY는 한개만 가능 
+);
+
+INSERT INTO MEM_PRIMARY VALUES(1, 'user01', 'pwd01', '홍길동', '남', '010-1234-5678', 'hong@naver.com');
+INSERT INTO MEM_PRIMARY VALUES(2, 'user02', 'pwd02', '나순이', '여', '010-1982-2929', 'na@google.com');
+INSERT INTO MEM_PRIMARY VALUES(NULL, 'user02', 'pwd02', '나순이', '여', '010-1982-2929', 'na@google.com');
+INSERT INTO MEM_PRIMARY VALUES(2, 'user03', 'pwd03', '나순이', '여', '010-1982-2929', 'na@google.com');
+
+-- 오류 : PRIMARY KEY는 하나만 가능
+CREATE TABLE TB_MULTI2 (
+    MEM_NO NUMBER,
+    PRODUCT_NAME VARCHAR2(10),
+    LIKE_DATE DATE,
+    PRIMARY KEY(MEM_NO), 
+    PRIMARY KEY(PRODUCT_NAME)
+);
+
+/*
+    * 복합키 : 기본키를 2개 이상의 컬럼을 묶어서 사용
+    
+    - 복합키 사용 예) 찜하기
+    회원번호 |  상품
+        1       |    A   ->   1A
+        1       |    A          부적합
+        1       |    B   ->   1B
+        1       |    C   ->   1C
+        2       |    A   ->   2A
+        2       |    C   ->   2C
+*/
+CREATE TABLE TB_MULTI (
+    MEM_NO NUMBER,
+    PRODUCT_NAME VARCHAR2(10),
+    LIKE_DATE DATE,
+    PRIMARY KEY(MEM_NO, PRODUCT_NAME)
+);
+
+INSERT INTO TB_MULTI VALUES(1, 'A' ,SYSDATE);
+INSERT INTO TB_MULTI VALUES(1, 'B', SYSDATE);
+INSERT INTO TB_MULTI VALUES(2, 'B', SYSDATE);
+INSERT INTO TB_MULTI VALUES(1, 'B', SYSDATE);  --> 오류
+
+---------------------------------------------------------------------------------------------------------
+-- 회원등급에 대한 테이블 생성
+CREATE TABLE MEM_GRADE (
+    GRADE_CODE NUMBER PRIMARY KEY,
+    GRADE_NAME VARCHAR2(30) NOT NULL
+);
+
+-- 10 : 일반회원, 20 : 우수회원, 30 : 특별회원
+INSERT INTO MEM_GRADE VALUES(10, '일반회원');
+INSERT INTO MEM_GRADE VALUES(20, '우수회원');
+INSERT INTO MEM_GRADE VALUES(30, '특별회원');
+
+-- 회원 정보 테이블 생성
+CREATE TABLE MEM(
+    MEM_NO NUMBER PRIMARY KEY,
+    MEM_ID VARCHAR2(20) NOT NULL UNIQUE,
+    MEM_PWD VARCHAR2(20) NOT NULL,
+    MEM_NAME VARCHAR2(20) NOT NULL,
+    GENDER CHAR(3) CHECK(GENDER IN ('남', '여')),
+    PHONE VARCHAR2(20),
+    EMAIL VARCHAR2(50),
+    GRADE_ID NUMBER   -- 회원 등급 보관 컬럼
+);
+
+INSERT INTO MEM VALUES(1, 'user01', 'pwd01', '홍길동', '남', '010-1234-5678', 'hong@naver.com', NULL);
+INSERT INTO MEM VALUES(2, 'user02', 'pwd02', '나순이', '여', '010-1982-2929', 'na@google.com', 10);
+INSERT INTO MEM VALUES(3, 'user03', 'pwd03', '김순이', '여', '010-1982-2929', 'na@google.com', 50);
+-- 유효한 회원 등급이 아님에도 입력됨
+
+---------------------------------------------------------------------------------------------------------
+/*
+    * FOREIGN KEY(외래키) 제약조건
+      다른 테이블에 존재하는 값만 들어와야 되는 컬럼에 부여하는 제약조건
+      --> 다른 테이블을 참조한다라고 표현
+      --> 주로 FOREIGN KEY 제약조건에 의해 테이블 간의 관계가 형성됨
+      
+      >> 컬럼 레벨 방식
+           -  컬럼명 자료형 REFERENCES 참조할테이블명(참조할컬럼명)
+              컬럼명 자료형 [CONSTRAINT 제약조건명] REFERENCES 참조할테이블명(참조할컬럼명)
+                
+      >> 테이블 레벨 방식
+          - FOREIGN KEY(컬럼명) REFERENCES 참조할테이블명(참조할컬럼명)
+            [CONSTRAINT 제약조건명] FOREIGN KEY(컬럼명) REFERENCES 참조할테이블명(참조할컬럼명)
+*/
