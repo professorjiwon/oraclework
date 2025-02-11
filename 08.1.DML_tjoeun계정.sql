@@ -142,5 +142,141 @@ WHEN HIRE_DATE >= '2000/01/01' THEN
 -- ID, NAME, SALARY, BONUS
 -- 테이블 2개 생성
 
+--=============================================================
+/*
+    2. UPDATE
+       : 테이블의 값들을 수정하는 구문
+       
+       [표현식]
+       UPDATE 테이블명
+       SET 컬럼명 = 바꿀값,
+             컬럼명 = 바꿀값,
+             ...
+       [WHERE 조건];
+          ---> 주의 : WHERE절을 생략하면 테이블안의 전체 컬럼값이 바뀜
+*/
+-- 테이블 생성
+CREATE TABLE DEPT_COPY
+AS SELECT * FROM DEPARTMENT;
 
-     
+-- 전체 행이 바뀜
+UPDATE DEPT_COPY
+SET DEPT_TITLE = '전략기획팀';
+
+ROLLBACK;
+
+-- 인사관리부는 전략기획팀으로 변경
+UPDATE DEPT_COPY
+SET DEPT_TITLE = '전략기획팀'
+WHERE DEPT_ID = 'D1';
+
+-- 급여를 넣을 테이블 생성
+CREATE TABLE EMP_SALARY
+AS SELECT EMP_ID, EMP_NAME, SALARY, BONUS
+    FROM EMPLOYEE;
+
+-- 지정보 사원의 급여를 2백만원으로 인상, 보너스 10%
+UPDATE EMP_SALARY
+SET SALARY = 2000000,
+        BONUS = 0.1
+-- WHERE EMP_NAME = '지정보';    --> 동명이인 일수도 있음   
+WHERE EMP_ID = '206';
+
+-- 전체 사원들의 급여를 10%인상
+UPDATE EMP_SALARY
+SET SALARY = SALARY * 1.1;
+
+-----------------------------------------------------------------------------------------------------------------
+/*
+    * 서브쿼리를 이용한 UPDATE
+    
+    [표현식]
+    UPDATE 테이블명
+    SET 컬럼명 = (서브쿼리)
+    [WHERE 조건식];
+*/
+
+-- 왕정보 사원의 급여와 보너스를 지정보사원과 동일하게 인상해줌
+UPDATE EMP_SALARY
+SET SALARY = (SELECT SALARY
+                       FROM EMP_SALARY
+                       WHERE EMP_ID = '206'),
+      BONUS = (SELECT BONUS
+                       FROM EMP_SALARY
+                       WHERE EMP_ID = '206')
+WHERE EMP_ID='214';
+
+ROLLBACK;
+
+-- 위의 서브쿼리를 하나로 합치면
+UPDATE EMP_SALARY
+SET (SALARY, BONUS) = (SELECT SALARY, BONUS
+                                   FROM EMP_SALARY
+                                   WHERE EMP_ID = '206') 
+WHERE EMP_ID='214';       
+
+-- 조정연, 유하보, 강정보 직원들의 급여와 보너스를 문정보 사원과 동일하게 인상
+UPDATE EMP_SALARY
+SET (SALARY, BONUS) = (SELECT SALARY, BONUS
+                                   FROM EMP_SALARY
+                                   WHERE EMP_NAME = '문정보') 
+WHERE EMP_NAME IN ('조정연', '유하보', '강정보');
+
+--EMPOYEE_COPY 테이블의 ASIA 지역에서 근무하는 사원들의 보너스를 0.3으로 변경
+SELECT EMP_ID
+FROM EMPLOYEE_COPY
+JOIN DEPARTMENT ON (DEPT_CODE = DEPT_ID)
+JOIN LOCATION ON(LOCATION_ID = LOCAL_CODE)
+WHERE LOCAL_NAME LIKE 'ASIA%';
+
+UPDATE EMPLOYEE_COPY
+SET BONUS = 0.3
+WHERE EMP_ID IN (SELECT EMP_ID
+                            FROM EMPLOYEE_COPY
+                            JOIN DEPARTMENT ON (DEPT_CODE = DEPT_ID)
+                            JOIN LOCATION ON(LOCATION_ID = LOCAL_CODE)
+                            WHERE LOCAL_NAME LIKE 'ASIA%');
+
+-----------------------------------------------------------------------------------------------------------------
+-- UPDATE시에도 제약조건을 만족해야함
+-- 200사원의 이름을 NULL로 변경
+UPDATE EMPLOYEE_COPY
+SET EMP_NAME = NULL
+WHERE EMP_ID = 200;
+
+UPDATE EMPLOYEE_COPY
+SET DEPT_CODE = 'D0'
+WHERE EMP_ID = 200;
+
+COMMIT;
+--=============================================================
+/*
+    3. DELETE
+        : 테이블의 데이터를 행단위로 삭제
+        
+        [표현식]
+        DELETE FROM 테이블명
+        [WHERE 조건식];
+        -->  WHERE절에 없으면 모든 행 삭제
+*/
+
+-- 모든 데이터 삭제
+DELETE FROM EMPLOYEE_COPY;
+
+ROLLBACK;
+
+-- 213 현정보 삭제
+DELETE FROM EMPLOYEE_COPY
+WHERE EMP_ID = 213;
+
+-- DEPT_CODE D8인 사원 삭제
+DELETE FROM EMPLOYEE_COPY
+WHERE DEPT_CODE = 'D8';
+
+/*
+    * TRUNCATE : 테이블의 전체 행을 삭제하는 구문
+            - DELETE 보다 속도가 빠르다
+            - 별도의 조건 제시 불가, ROLLBACK 불가
+*/
+TRUNCATE TABLE EMP_SALARY;
+ROLLBACK;
