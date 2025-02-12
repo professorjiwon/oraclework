@@ -158,8 +158,124 @@ AS SELECT EMP_ID, EMP_NAME, EMP_NO, JOB_CODE, SALARY, SALARY*12 연봉
       
 -- INSERT
 INSERT INTO VW_SAL VALUES(400, '아무개', '901023-2738465', 'J1', 3000000, 36000000);
+-- 오류
 
+-- 사번 302인 사원의 연봉 30000000
+UPDATE VW_SAL
+SET 연봉 = 30000000
+WHERE EMP_ID = 302;
+-- 오류
 
+-- 사번 302 사원의 급여 2500000
+UPDATE VW_SAL
+SET SALARY = 2500000
+WHERE EMP_ID = 302;
 
+-- DELETE
+DELETE FROM VW_SAL
+WHERE 연봉 = 18600000;
 
+-- 2개 동일 : 한 그룹에 여러명이 포함되어 있기 때문
+-- 4) 그룹함수나 GROUP BY절이 포함된 경우
+-- 5) DISTINCT 구문이 포함된 경우
+CREATE OR REPLACE VIEW VW_GROUP
+AS SELECT DEPT_CODE, SUM(SALARY) 합계, CEIL(AVG(SALARY)) 평균
+      FROM EMPLOYEE
+    GROUP BY DEPT_CODE;
 
+-- INSERT (오류)
+INSERT INTO VW_GROUP VALUES('D3', 80000000, 40000000);
+
+-- UPDATE (오류)
+UPDATE VW_GROUP
+SET 합계 = 80000000
+WHERE DEPT_CODE = 'D1';
+
+-- DELETE (오류)
+DELETE FROM VW_GROUP
+WHERE 합계 = 4970000;
+
+-- 6) JOIN을 이용하여 여러 테이블을 연결시켜놓은 경우
+CREATE OR REPLACE VIEW VW_JOIN
+AS SELECT EMP_ID, EMP_NAME, EMP_NO, JOB_CODE, DEPT_TITLE
+      FROM EMPLOYEE
+      JOIN DEPARTMENT ON (DEPT_CODE = DEPT_ID);
+      
+-- INSERT (오류)
+INSERT INTO VW_JOIN VALUES('400','이순신', '981112-2847564','J1','총무부');
+
+-- UPDATE (오류)
+UPDATE VW_JOIN
+SET DEPT_TITLE = '회계관리부'
+WHERE EMP_ID = '217';
+
+-- DELETE
+DELETE VW_JOIN
+WHERE EMP_ID = 211;
+      
+---------------------------------------------------------------------------------------------------
+/*
+    * VIEW 옵션
+    
+    [상세표현식] 
+    CREATE [OR REPLACE] [FORCE | NOFORCE] VIEW 뷰명
+    AS 서브쿼리
+    [WITH CHECK OPTION]
+    [WITH READ ONLY]
+    
+    - OR REPLACE : 기존에 동일한 이름의 뷰가 존재하면 덮어쓰기, 존재하지 않으면 새로 생성
+    - FORCE | NOFORCE
+      > FORCE : 서브쿼리에 기술된 테이블이 존재하지 않아도 뷰를 생성할 수 있다
+      > NOFORCE : 서브쿼리에 기술된 테이블이 반드시 존재 해야만 뷰를 생성할 수 있다(기본값)
+    - WITH CHECK OPTION : DML시 서브쿼리에 기술된 조건에 부합한 값으로만 DML가능하도록 함
+    - WITH READ ONLY : 뷰를 조회만 가능(SELECT를 제외한 DML 불가)
+*/
+-- FORCE  생성은 되지만 활용 못함(타입이 정의되지 않음)
+CREATE OR REPLACE FORCE VIEW VW_EMP
+AS SELECT TCODE, TNAME, TCONTENT
+        FROM TTT;
+
+-- WITH CHECK OPTION
+CREATE OR REPLACE VIEW VW_EMP
+AS SELECT *
+      FROM EMPLOYEE
+      WHERE SALARY >= 3000000;
+      
+-- 301번을 2000000만원으로 변경
+UPDATE VW_EMP
+SET SALARY = 2000000
+WHERE EMP_ID = '301';
+
+ROLLBACK;
+
+-- WITH CHECK OPTION
+CREATE OR REPLACE VIEW VW_EMP
+AS SELECT *
+      FROM EMPLOYEE
+      WHERE SALARY >= 3000000
+WITH CHECK OPTION;      
+
+-- WITH CHECK OPTION 위배 오류
+UPDATE VW_EMP
+SET SALARY = 2000000
+WHERE EMP_ID = '301';
+
+-- 가능
+UPDATE VW_EMP
+SET SALARY = 4000000
+WHERE EMP_ID = '301';
+
+ROLLBACK;
+
+-- WITH READ ONLY
+CREATE OR REPLACE VIEW VW_EMP
+AS SELECT *
+      FROM EMPLOYEE
+      WHERE SALARY >= 3000000
+WITH READ ONLY;
+
+-- 읽기 전용 (DML불가)
+DELETE VW_EMP
+WHERE EMP_ID = 217;
+
+SELECT * FROM VW_EMP;
