@@ -3,16 +3,19 @@
     계정에게 시스템 권한 또는 객체접근할 수 있는 권한 부여(GRANT) 하거나 회수(REVOKE)하는 구문
     
     >> 시스템 권한 : DB에 접근하는 권한, 객체들을 생성할 수 있는 권한
-         * 종류
-            - CREATE SESSION : 접속할 수 있는 권한
-            - CREATE TABLE : 테이블을 생성할 수 있는 권한
-            - CREATE VIEW : 뷰를 생성할 수 있는 권한
-            - CREATE SEQUENCE : 시퀀스를 생성할 수 있는 권한
-              ...
     >> 객체 접근 권한 : 특정객체를 조작할 수 있는 권한  
 */
-
+-----------------------------------------------------------------------------------------
+/*
+     * 시스템 권한 종류
+        - CREATE SESSION : 접속할 수 있는 권한
+        - CREATE TABLE : 테이블을 생성할 수 있는 권한
+        - CREATE VIEW : 뷰를 생성할 수 있는 권한
+        - CREATE SEQUENCE : 시퀀스를 생성할 수 있는 권한
+          ...
+*/
 ALTER SESSION SET "_oracle_script" = true;
+
 -- 1. SAMPLE / 1234  사용자 생성
 CREATE USER SAMPLE IDENTIFIED BY 1234;
     -- 접속 못함. 접근 권한 없음
@@ -61,7 +64,7 @@ REVOKE INSERT ON TJOEUN.EMPLOYEE FROM SAMPLE;
     
     CONNECT : CREATE, SESSION
     RESOURCE : CREATE TABLE, CREATE SEQUENCE, ....
-    DBA : 시스템 및 객체관리에 대한 모든 권한을 갖고 있는롤
+    DBA : 시스템 및 객체관리에 대한 모든 권한을 갖고 있는 롤
 */
 
 GRANT CONNECT, RESOURCE TO SAMPLE;

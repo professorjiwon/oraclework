@@ -53,3 +53,6 @@ ALTER SESSION SET "_oracle_script" = true;
 CREATE USER ddl IDENTIFIED BY 1234;
 GRANT CONNECT, RESOURCE TO ddl;
 ALTER USER ddl default tablespace users quota unlimited on users;
+
+-- tjoeun view 생성 권한
+GRANT CREATE VIEW TO tjoeun;
