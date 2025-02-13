@@ -561,5 +561,21 @@ BEGIN
 END;
 /
 
-
-
+-- 2.2. WHILE LOOP
+DECLARE
+    DAN NUMBER := 2;
+    Z NUMBER;
+BEGIN
+    WHILE DAN <= 9
+    LOOP
+        Z := 1;
+        WHILE Z <= 9
+        LOOP
+            DBMS_OUTPUT.PUT_LINE(DAN || ' * ' || Z || ' = ' || DAN * Z);
+            Z := Z+1;
+        END LOOP;
+        DBMS_OUTPUT.PUT_LINE('');
+        DAN := DAN + 2;
+    END LOOP;
+END;
+/
